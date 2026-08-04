@@ -1,26 +1,215 @@
 @import "tailwindcss";
 
+/* next-themes sets class="dark" on <html>, so dark: variants key off that
+   instead of the OS media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   PALETTE — raw values. You almost never reference these directly in a
+   component; use the semantic tokens below. Changing the whole look of the
+   site should mean editing this block and nothing else.
+   --------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink-50: oklch(0.985 0.002 265);
+  --ink-100: oklch(0.968 0.003 265);
+  --ink-200: oklch(0.925 0.005 265);
+  --ink-300: oklch(0.86 0.007 265);
+  --ink-400: oklch(0.7 0.01 265);
+  --ink-500: oklch(0.56 0.012 265);
+  --ink-600: oklch(0.44 0.014 265);
+  --ink-700: oklch(0.34 0.014 265);
+  --ink-800: oklch(0.24 0.012 265);
+  --ink-900: oklch(0.17 0.01 265);
+  --ink-950: oklch(0.115 0.008 265);
+
+  --brand-400: oklch(0.78 0.15 195);
+  --brand-500: oklch(0.7 0.16 195);
+  --brand-600: oklch(0.6 0.15 195);
+
+  /* SEMANTIC TOKENS — light theme. Components only ever use these. */
+  --bg: var(--ink-50);
+  --bg-subtle: var(--ink-100);
+  --bg-elevated: #fff;
+  --fg: var(--ink-900);
+  --fg-muted: var(--ink-600);
+  --fg-subtle: var(--ink-500);
+  --border: var(--ink-200);
+  --border-strong: var(--ink-300);
+  --accent: var(--brand-600);
+  --accent-fg: #fff;
+  --ring: var(--brand-500);
+
+  /* three.js cannot parse oklch(), so the 3D layer reads these hex mirrors.
+     Keep them visually in step with --accent / --bg above. */
+  --accent-hex: #0d93a3;
+  --bg-hex: #fafafa;
+
+  /* Motion. Respect these instead of hardcoding durations so the whole site
+     can be slowed down or sped up from one place. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 150ms;
+  --dur-base: 260ms;
+  --dur-slow: 500ms;
 }
 
+.dark {
+  --bg: var(--ink-950);
+  --bg-subtle: var(--ink-900);
+  --bg-elevated: var(--ink-900);
+  --fg: var(--ink-100);
+  --fg-muted: var(--ink-400);
+  --fg-subtle: var(--ink-500);
+  --border: oklch(0.28 0.012 265);
+  --border-strong: oklch(0.36 0.014 265);
+  --accent: var(--brand-400);
+  --accent-fg: var(--ink-950);
+  --ring: var(--brand-400);
+
+  --accent-hex: #4fd8e8;
+  --bg-hex: #0a0a0c;
+}
+
+/* ---------------------------------------------------------------------------
+   Expose the semantic tokens to Tailwind so `bg-bg`, `text-fg-muted`,
+   `border-border`, `duration-base` etc. all work as utilities.
+   --------------------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-var), ui-monospace, SFMono-Regular, monospace;
+
+  --ease-out-quint: var(--ease-out-quint);
+  --animate-duration-fast: var(--dur-fast);
+
+  /* A wider container step than Tailwind's default max-w scale. */
+  --spacing-gutter: 1.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* --------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor jumps so headings don't hide under the sticky header. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  /* Global motion kill-switch. Anything animated must honour this — the 3D
+     layer checks the same query in src/three/canvas/capability.ts. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Shown only to screen readers — used for skip links and icon-button labels. */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Code blocks. rehype-pretty-code emits both a light and a dark Shiki theme as
+   CSS variables on each token; these rules pick the right one.
+   --------------------------------------------------------------------------- */
+[data-rehype-pretty-code-figure] pre {
+  overflow-x: auto;
+  padding: 1rem 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border-radius: 0.5rem;
+  background-color: var(--shiki-light-bg);
+}
+
+.dark [data-rehype-pretty-code-figure] pre {
+  background-color: var(--shiki-dark-bg);
+}
+
+[data-rehype-pretty-code-figure] code {
+  display: grid;
+  counter-reset: line;
+}
+
+[data-rehype-pretty-code-figure] code > .line {
+  padding: 0 1rem;
+  border-left: 2px solid transparent;
+}
+
+[data-rehype-pretty-code-figure] code > .line--highlighted {
+  border-left-color: var(--accent);
+  background-color: color-mix(in oklch, var(--accent) 12%, transparent);
+}
+
+[data-rehype-pretty-code-figure] span[data-line] span {
+  color: var(--shiki-light);
+}
+
+.dark [data-rehype-pretty-code-figure] span[data-line] span {
+  color: var(--shiki-dark);
+}
+
+[data-rehype-pretty-code-title] {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background-color: var(--bg-subtle);
+}
+
+[data-rehype-pretty-code-title] + pre {
+  border-radius: 0 0 0.5rem 0.5rem;
 }

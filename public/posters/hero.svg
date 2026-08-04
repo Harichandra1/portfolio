@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" role="img" aria-label="A lattice of glowing points">
+  <defs>
+    <!-- Mirrors the accent token. Falls back gracefully in any renderer. -->
+    <radialGradient id="tint" cx="50%" cy="58%" r="62%">
+      <stop offset="0%" stop-color="#4fd8e8" stop-opacity="0.95" />
+      <stop offset="55%" stop-color="#0d93a3" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#0d93a3" stop-opacity="0" />
+    </radialGradient>
+
+    <pattern id="lattice" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="13" cy="13" r="1.9" fill="#fff" />
+    </pattern>
+
+    <!-- Ripples the dot field so the still reads like a frame of the animation. -->
+    <mask id="ripple">
+      <rect width="1200" height="700" fill="url(#lattice)" />
+    </mask>
+
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity="0" />
+      <stop offset="35%" stop-color="#fff" stop-opacity="1" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0" />
+    </linearGradient>
+
+    <mask id="vignette">
+      <rect width="1200" height="700" fill="url(#fade)" />
+    </mask>
+  </defs>
+
+  <g mask="url(#vignette)">
+    <g mask="url(#ripple)">
+      <rect width="1200" height="700" fill="url(#tint)" />
+    </g>
+  </g>
+</svg>

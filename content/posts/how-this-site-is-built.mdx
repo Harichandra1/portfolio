@@ -1,0 +1,61 @@
+---
+title: How this site is built
+summary: The architecture behind this portfolio — one shared WebGL canvas, MDX content validated at build time, and a deliberate rule that adding anything is one file.
+date: 2026-08-04
+tags: [next.js, architecture, three.js]
+featured: true
+---
+
+The goal for this site was not a design. It was a property: **adding something
+should be one file and one commit.** Everything else follows from that.
+
+## Content is data, not code
+
+Projects, posts, and lab notes are `.mdx` files under `content/`. Frontmatter is
+parsed by `gray-matter` and validated with Zod before anything renders:
+
+```ts title="src/lib/content/schema.ts"
+export const postSchema = base.extend({
+  featured: z.boolean().default(false),
+});
+```
+
+A missing `summary` or a mistyped `tags` key fails the build with the offending
+file name. That's the point — a broken page in production is much worse than a
+red build.
+
+## One canvas, many scenes
+
+The naive approach puts a `<Canvas>` inside each 3D component. Browsers cap you
+at roughly sixteen WebGL contexts, and every route change tears down and rebuilds
+the renderer.
+
+Instead there's a single canvas fixed behind the whole app. Components claim a
+rectangle of it with `<SceneView>`:
+
+```tsx
+<SceneView name="hero" />
+```
+
+<Callout type="note">
+  The canvas doesn't mount until at least one `SceneView` registers, so pages with no 3D
+  create no WebGL context at all.
+</Callout>
+
+## 3D never breaks the site
+
+Three gates sit in front of every scene:
+
+| Check                              | Behaviour when it fails            |
+| ---------------------------------- | ---------------------------------- |
+| `prefers-reduced-motion`           | Poster image, no WebGL             |
+| No WebGL2 / low memory / save-data | Poster image, no WebGL             |
+| Scene throws at runtime            | Error boundary swaps in the poster |
+
+The poster is a static SVG. Worst case, the visitor sees a still image and the
+page is otherwise untouched.
+
+## What this buys
+
+Six months from now, a new experiment is: add `content/lab/thing.mdx`, add a
+scene folder, add one line to the registry. No restructuring.

@@ -1,0 +1,20 @@
+---
+title: Sine field
+summary: Two out-of-phase trig waves multiplied together — the cheapest displacement that doesn't look like it repeats.
+date: 2026-08-04
+tags: [glsl, sketch]
+status: working
+---
+
+The lab is for things that don't deserve a project page. Rough is fine here.
+
+```glsl
+float wave =
+  sin(p.x * 0.55 + uTime * 0.62) *
+  cos(p.z * 0.48 + uTime * 0.41);
+```
+
+Multiplying two waves at unrelated frequencies gives a period long enough that
+the eye never catches the loop. Adding them instead produces obvious banding.
+
+Next: replace with curl noise and compare the cost.
