@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
 import { SceneView } from "@/three/canvas/scene-view";
+import { Sticker } from "@/components/stickers/sticker";
 
 export function Hero() {
   return (
@@ -30,6 +31,19 @@ export function Hero() {
       </div>
 
       <Container width="wide" className="relative py-16 sm:py-24 lg:py-32">
+        {/*
+          The one sticker on a page that has to be believed. Wordless on
+          purpose — the hero already asks for a headline, a paragraph and
+          three buttons to be read, and a text sticker would be a fourth
+          thing competing for the first two seconds. It sits in the gap
+          between the copy (max-w-lg) and the scene panel, so it crowds
+          neither.
+        */}
+        <Sticker
+          name="chai"
+          className="bottom-32 left-[56%] hidden w-20 -rotate-[12deg] lg:block xl:left-[50%]"
+        />
+
         <p className="text-fg-subtle font-mono text-xs tracking-wide uppercase">
           {siteConfig.role} · {siteConfig.location}
         </p>
