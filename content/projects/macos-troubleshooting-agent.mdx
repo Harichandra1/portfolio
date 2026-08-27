@@ -37,8 +37,8 @@ tried restarting it" without ever asking what a user has already ruled out.
 ## Context
 
 A solo project — Python, LangGraph, FastAPI, Qdrant, Llama 3.3 70B,
-PostgreSQL, Docker, and Oracle Cloud, at roughly 17,500 lines of code, [live
-at macos-agent-hari.duckdns.org](https://macos-agent-hari.duckdns.org).
+PostgreSQL, Docker, and Oracle Cloud, at roughly 17,500 lines of code, and <Claim id="agent-live">deployed and
+reachable</Claim> at [macos-agent-hari.duckdns.org](https://macos-agent-hari.duckdns.org).
 
 ## Role
 
@@ -46,7 +46,7 @@ Solo: design, build, deploy, and evaluate.
 
 ## Exploration
 
-The write path is nine custom scrapers pulling from Apple Developer Forums,
+The write path is <Claim id="agent-scrapers">nine custom scrapers</Claim> pulling from Apple Developer Forums,
 Ask Different, Stack Overflow, Reddit, WWDC, man pages, dev docs, and GitHub
 — cleaned, tagged, and chunked one problem per document. The open question
 wasn't how to retrieve; it was when to stop trusting the knowledge base and
@@ -54,7 +54,7 @@ go outside it.
 
 ## Decisions
 
-- **A branching graph, not a linear chain.** `intake → {kb_retrieve,
+- <Claim id="agent-graph">**A branching graph, not a linear chain.**</Claim> `intake → {kb_retrieve,
 web_search} → smart_merge → decide`, where `decide` branches three ways:
   answer directly, ask a clarifying question, or request a diagnostic from
   the user. That three-way branch isn't expressible as a straight-line RAG
@@ -67,20 +67,20 @@ web_search} → smart_merge → decide`, where `decide` branches three ways:
   tried instead of leading with the easiest step every time.
 - **Stateful multi-turn memory.** macOS version, chip, and already-tried
   steps accumulate into a running case file across turns, persisted via
-  `langgraph-checkpoint-postgres` so it survives a restart or redeploy
+  `langgraph-checkpoint-postgres` so it <Claim id="agent-durable-memory">survives a restart or redeploy</Claim>
   instead of living in process memory.
-- **Cross-provider LLM failover** across Groq, NVIDIA, and OpenRouter, so a
+- **Cross-provider LLM failover** <Claim id="agent-failover">across Groq, NVIDIA, and OpenRouter</Claim>, so a
   single provider outage doesn't take the agent down mid-conversation.
 
 ## Implementation
 
 Production concerns that don't usually show up in a portfolio project:
-Google OAuth into session JWTs, PII redaction and prompt-abuse guardrails,
+Google OAuth into session JWTs, <Claim id="agent-guardrails">PII redaction and prompt-abuse guardrails</Claim>,
 per-turn token and cost accounting with weekly and monthly spend caps, rate
 limiting via `slowapi`, Alembic migrations run on boot, Prometheus and
 Grafana dashboards with structured logs shipped through Loki, GitHub Actions
-CI, and deploy/rollback/recover scripts backed by a smoke test. Nine test
-modules cover auth, credits, guardrails, and the async Postgres checkpointer.
+CI, and deploy/rollback/recover scripts backed by a smoke test. <Claim id="agent-tests">Nine test
+modules</Claim> cover auth, credits, guardrails, and the async Postgres checkpointer.
 
 ## Challenges
 
@@ -95,12 +95,12 @@ opinion of itself.
 Two judge models score every candidate build blind — without seeing each
 other's scores — across correctness, actionability, grounding, and
 depth-triage, and the result is checked against a committed `baseline.json`.
-If a change makes the agent measurably worse, the deploy is blocked, not
-just flagged.
+If a change makes the agent measurably worse, <Claim id="agent-eval-gate">the deploy is blocked, not
+just flagged</Claim>.
 
 ## Results
 
-This hasn't shipped to real users, so there's no traffic graph here — the
+This hasn't shipped to real users, so <Claim id="agent-no-usage">there's no traffic graph here</Claim> — the
 honest results are the eval's, not a usage dashboard.
 
 <ResultsTable
@@ -135,13 +135,13 @@ honest results are the eval's, not a usage dashboard.
 I built the judge panel expecting it to confirm the agent was good. It
 didn't.
 
-On single-shot questions — one prompt, one answer, no follow-up — GPT-4o
-beat my agent in 5 of 6 cases. A 70B model with retrieval does not
+On single-shot questions — one prompt, one answer, no follow-up — <Claim id="agent-singleshot">GPT-4o
+beat my agent in 5 of 6 cases</Claim>. A 70B model with retrieval does not
 out-recall a frontier model, and my own eval said so plainly.
 
 On multi-turn diagnosis, which is what the product actually does, the
-numbers inverted: the agent resolved 2 of 4 cases in an average of 2.25
-turns; GPT-4o resolved 1 of 4 in 3.25. Four cases, run interactively —
+numbers inverted: <Claim id="agent-multiturn">the agent resolved 2 of 4 cases in an average of 2.25
+turns; GPT-4o resolved 1 of 4 in 3.25</Claim>. Four cases, run interactively —
 treat that as a signal, not a result.
 
 The split is the finding. The agent's advantage isn't knowing more; it's

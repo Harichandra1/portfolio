@@ -11,6 +11,7 @@ import { EntryCard } from "@/components/sections/entry-card";
 import { Skills } from "@/components/sections/skills";
 import { ExperienceTimeline } from "@/components/sections/experience-timeline";
 import { Contact } from "@/components/sections/contact";
+import { ReceiptsNote } from "@/components/sections/receipts-note";
 
 export const metadata = buildMetadata({ path: "/" });
 
@@ -105,6 +106,7 @@ export default async function HomePage() {
         </section>
       )}
 
+      <ReceiptsNote />
       <Contact />
     </>
   );

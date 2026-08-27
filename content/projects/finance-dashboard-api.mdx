@@ -42,22 +42,22 @@ springdoc-openapi for docs.
 unauthenticated-request behavior is an HTML redirect to a login page — fine
 for a browser, useless for an API client, which just sees a redirect where
 it expected JSON. This service replaces that default with a
-`RestAuthenticationEntryPoint` and `RestAccessDeniedHandler` pair returning
-proper 401 and 403 JSON responses, backed by a custom `UserDetailsService`
+`RestAuthenticationEntryPoint` and `RestAccessDeniedHandler` pair <Claim id="finance-json-401">returning
+proper 401 and 403 JSON responses</Claim>, backed by a custom `UserDetailsService`
 against the app's own `User` entity.
 
 **Aggregation pushed into SQL.** The dashboard's category totals and
 monthly trends are computed via interface-based JPA projections
-(`CategoryTotalProjection`, `MonthlyTrendProjection`) rather than loading
-full entities into Java and summing them in application code. Only the
+(`CategoryTotalProjection`, `MonthlyTrendProjection`) <Claim id="finance-projections">rather than loading
+full entities into Java and summing them in application code</Claim>. Only the
 columns a projection actually needs cross the wire — a real performance
 decision, not a default.
 
 **Split request and response DTOs.** `UserRequest`, `UserUpdateRequest`, and
 `UserResponse` are separate types rather than one class reused in both
 directions, sub-packaged by concern (`dto/record/`, `dto/user/`,
-`dto/dashboard/`). That separation is what keeps a password hash from ever
-being able to leak through a response body — it can't serialize what the
+`dto/dashboard/`). That separation is what <Claim id="finance-dto-split">keeps a password hash from ever
+being able to leak through a response body</Claim> — it can't serialize what the
 response type doesn't have a field for.
 
 ## Implementation

@@ -174,6 +174,38 @@ adding a new accent use anywhere (a badge, a highlight, a scene tint), check
 what's already claiming the accent in that view and use a hairline border,
 a background-color delta, or plain `--fg`/`--fg-muted` weight instead.
 
+## Receipts
+
+Claims on this site carry evidence. `content/data/claims.ts` is the registry;
+`<Claim id="...">text</Claim>` marks the claim in MDX, and `{{id|text}}` does
+the same inside `content/data/*.ts`, which can't hold JSX.
+
+The rule the registry encodes: **a claim is either checkable or labelled as
+not checkable, and there is no third option.** `kind: "self-reported"` entries
+have no `href` on purpose — private work with no public artifact — and they
+render in a visibly different style so a reader can tell at a glance which
+claims they can verify. Making the two look alike would defeat the point.
+
+`pnpm honesty` (`scripts/honesty-check.ts`) enforces it, and runs in `pnpm
+check` and CI ahead of the build. It fails on:
+
+- banned superlatives and growth-copy verbs in `content/`
+- a benchmark percentage without its sample size in the same paragraph
+- a percentage outside a `<Claim>`
+- a `<Claim id>` that isn't registered, or a registered claim never used
+- a self-reported claim carrying a link, or a checkable one linking nowhere
+
+The rules are deliberately blunt. A check that only passes when someone
+remembers to be careful isn't a check. **Fix the copy, not the rule** — if a
+rule genuinely needs to change, that should be its own considered commit.
+
+Two gotchas:
+
+- **Never wrap a markdown link in `<Claim>`.** The claim renders a `<button>`;
+  an anchor inside it is invalid HTML. Put the claim on adjacent plain text.
+- The checker skips `claim.tsx` / `claim-text.tsx`, which quote the syntax in
+  their own doc comments.
+
 ## Content honesty
 
 Every fact, number, and claim on this site — work history, project
@@ -232,7 +264,8 @@ merge. Content-only commits can go straight to `main`.
 
 ```bash
 pnpm dev        # dev server
-pnpm check      # typecheck + lint + build — what CI runs
+pnpm check      # typecheck + lint + honesty + build — what CI runs
+pnpm honesty    # the content gate on its own
 pnpm format     # prettier
 ```
 

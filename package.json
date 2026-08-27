@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "new": "tsx scripts/new.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm build"
+    "check": "pnpm typecheck && pnpm lint && pnpm honesty && pnpm build",
+    "honesty": "tsx scripts/honesty-check.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "./section";
 import { Tag } from "@/components/ui/tag";
+import { ClaimText } from "@/components/ui/claim-text";
 import type { Role } from "@content/data/experience";
 
 function formatRange(start: string, end: string | null) {
@@ -46,7 +47,9 @@ function RoleRow({ role }: { role: Role }) {
         </div>
 
         {role.note ? (
-          <p className="text-fg-subtle mt-2 text-sm italic">{role.note}</p>
+          <p className="text-fg-subtle mt-2 text-sm italic">
+            <ClaimText text={role.note} />
+          </p>
         ) : null}
 
         <ul className="text-fg-muted mt-4 space-y-2 text-sm">
@@ -55,7 +58,9 @@ function RoleRow({ role }: { role: Role }) {
               <span className="text-fg-subtle" aria-hidden>
                 —
               </span>
-              <span>{h}</span>
+              <span>
+                <ClaimText text={h} />
+              </span>
             </li>
           ))}
         </ul>

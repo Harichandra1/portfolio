@@ -13,18 +13,17 @@ links:
   repo: https://github.com/Harichandra1/E-WALLET-MICROSERVICES_JBDL
 ---
 
-A course project (the package path is `org/gfg`, so this came out of a
-GeeksforGeeks-style curriculum), built solo. It decomposes a digital wallet
-into four Spring Boot services — user, wallet, transaction, and notification
-— communicating asynchronously over Kafka instead of direct HTTP calls
-between them.
+<Claim id="wallet-course">A course project</Claim> (the package path is `org/gfg`, so this
+came out of a GeeksforGeeks-style curriculum), built solo. It decomposes a digital wallet
+into four Spring Boot services — user, wallet, transaction, and notification —
+communicating asynchronously over Kafka instead of direct HTTP calls between them.
 
 ## Design decisions worth naming
 
 Each service owns its own data: separate repositories, separate DTO sets,
 nothing shared through a common entity. The wallet service runs two
-distinct consumers — one for wallet-creation events, one for
-transaction-update events — each with its own consumer group and
+distinct consumers — <Claim id="wallet-consumer-groups">one for wallet-creation events, one for
+transaction-update events</Claim> — each with its own consumer group and
 deserializer, so the two event types can be processed and scaled
 independently rather than sharing one queue. Pre-transaction user validation
 sits in front of the transaction path, guarding against moving money for a
@@ -34,6 +33,6 @@ user in a bad state.
 
 Named honestly, not discovered by an interviewer: there's no
 `docker-compose.yml`, so running Kafka, MySQL, and four services locally
-takes manual setup. And there's no idempotency key or dead-letter handling
-on the consumers — if a transaction-update event replays, nothing today
+takes manual setup. And <Claim id="wallet-gaps">there's no idempotency key or dead-letter handling
+on the consumers</Claim> — if a transaction-update event replays, nothing today
 stops a double-credit. For a real wallet, that's the first thing I'd fix.

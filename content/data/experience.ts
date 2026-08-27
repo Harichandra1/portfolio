@@ -31,10 +31,10 @@ export const experience: Role[] = [
     end: null,
     location: "Remote — async with a Canada-based team",
     url: "https://www.metryai.com/en",
-    note: "Joined as a Backend Engineer; moved onto the founding engineering team about three months in.",
+    note: "{{metry-founding|Joined as a Backend Engineer; moved onto the founding engineering team about three months in.}}",
     highlights: [
-      "Own backend architecture and REST API development for SOJO — Metry AI's client-management platform for beauty and wellness businesses across Asia — carrying microservices and data models from design through production support.",
-      "Cut API response times 33% by reworking database indexing, caching, and query paths to eliminate redundant PostgreSQL reads.",
+      "Own backend architecture and REST API development for SOJO — {{metry-sojo|Metry AI's client-management platform for beauty and wellness businesses across Asia}} — carrying microservices and data models from design through production support.",
+      "Cut {{metry-latency|API response times 33%}} by reworking database indexing, caching, and query paths to eliminate redundant PostgreSQL reads.",
       "Integrated LLM APIs and rebuilt prompt workflows behind structured testing and evaluation, raising response quality and consistency across platform features.",
       "Instrumented API performance, service health, and production failures in Grafana, shortening the path from a failure firing to a diagnosed root cause.",
       "Work largely async with a team about ten hours away, across architecture, CI/CD, and reliability decisions.",

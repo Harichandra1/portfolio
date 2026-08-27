@@ -7,6 +7,7 @@ import { Scene } from "./scene-embed";
 import { SystemFigure } from "./system-figure";
 import { ResultsTable } from "@/components/ui/results-table";
 import { Stat } from "@/components/ui/stat";
+import { Claim } from "@/components/ui/claim";
 
 /**
  * What MDX files are allowed to use.
@@ -40,4 +41,5 @@ export const mdxComponents: MDXComponents = {
   SystemFigure,
   ResultsTable,
   Stat,
+  Claim,
 };

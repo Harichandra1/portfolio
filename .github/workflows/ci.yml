@@ -34,7 +34,12 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      # Also the content gate: invalid MDX frontmatter fails here, before it
+      # The content gate — fails on unbacked claims, a benchmark number
+      # missing its sample size, or a claim registered without evidence.
+      - name: Honesty check
+        run: pnpm honesty
+
+      # Also a content gate: invalid MDX frontmatter fails here, before it
       # can reach production.
       - name: Build
         run: pnpm build
