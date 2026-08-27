@@ -5,21 +5,17 @@ import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/container";
 import { ThemeToggle } from "./theme-toggle";
+import { Wordmark } from "@/components/ui/wordmark";
 import { cn } from "@/lib/utils";
 
 export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="border-border bg-bg/80 sticky top-0 z-50 border-b backdrop-blur-md">
+    <header className="border-border bg-bg/85 sticky top-0 z-50 border-b backdrop-blur-sm">
       <Container width="wide" className="flex h-16 items-center justify-between gap-4">
-        <Link
-          href="/"
-          className="text-fg font-mono text-sm font-semibold tracking-tight"
-          aria-label={`${siteConfig.name} — home`}
-        >
-          {siteConfig.shortName}
-          <span className="text-accent">.</span>
+        <Link href="/" aria-label={`${siteConfig.name} — home`}>
+          <Wordmark />
         </Link>
 
         <div className="flex items-center gap-1">
@@ -34,7 +30,7 @@ export function Header() {
                       href={item.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "rounded-md px-2.5 py-1.5 text-sm transition-colors sm:px-3",
+                        "rounded-(--radius-md) px-2.5 py-1.5 font-mono text-xs tracking-wide uppercase transition-colors sm:px-3",
                         active ? "text-fg" : "text-fg-muted hover:text-fg",
                       )}
                     >

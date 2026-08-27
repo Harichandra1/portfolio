@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import type { SceneName } from "./names";
+import { HeroPoster } from "./hero/poster";
 
 /**
  * The catalogue of 3D scenes.
@@ -10,7 +11,10 @@ import type { SceneName } from "./names";
  * To add a scene:
  *   1. create `src/three/scenes/<name>/index.tsx` with a default export
  *      containing only three.js elements (no DOM),
- *   2. drop a static fallback image at `public/posters/<name>.svg`,
+ *   2. create `src/three/scenes/<name>/poster.tsx` — an inline SVG fallback
+ *      reading the same design tokens the scene does (see hero/poster.tsx
+ *      for the pattern; this is what ships when 3D is unavailable, and what
+ *      the server always sends),
  *   3. add the name to `names.ts`, then an entry here.
  *
  * Anything can then render it with `<SceneView name="<name>" />`, and MDX
@@ -18,9 +22,9 @@ import type { SceneName } from "./names";
  */
 export type SceneEntry = {
   Component: ComponentType;
-  /** Static image shown when 3D is unavailable, disabled, or has errored. */
-  poster: string;
-  /** Alt text for the poster — describe the visual, not the technology. */
+  /** Static visual shown when 3D is unavailable, disabled, or has errored. */
+  Poster: ComponentType<{ className?: string }>;
+  /** Accessible label for the poster — describe the visual, not the technology. */
   alt: string;
 };
 
@@ -29,8 +33,8 @@ export type SceneEntry = {
 export const sceneRegistry: Record<SceneName, SceneEntry> = {
   hero: {
     Component: dynamic(() => import("./hero"), { ssr: false }),
-    poster: "/posters/hero.svg",
-    alt: "A lattice of glowing points rippling across a surface",
+    Poster: HeroPoster,
+    alt: "A quiet lattice of points rippling across a surface",
   },
 };
 

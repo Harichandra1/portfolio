@@ -1,0 +1,76 @@
+---
+title: Finance Dashboard API
+summary: A Spring Boot REST API for personal finance tracking, with a security layer that returns proper 401/403 JSON instead of Spring's default HTML redirects, and JPA projections that push aggregation into SQL.
+date: 2026-04-04
+tags: [spring-boot, spring-security, java, jpa]
+kind: case-study
+order: 2
+role: Solo
+stack:
+  [
+    Java,
+    "Spring Boot",
+    "Spring Security",
+    "Spring Data JPA",
+    MySQL,
+    H2,
+    "springdoc-openapi",
+  ]
+problem: Most tutorial Spring Security setups leave the default HTML-redirect behavior in place, which silently breaks any client that isn't a browser.
+approach: A layered Spring Boot service with a custom entry point that returns JSON, and JPA projections that push aggregation into SQL instead of Java.
+outcome: The cleanest Java in the portfolio — a real security layer, split DTOs, and integration tests, not just a CRUD demo.
+links:
+  repo: https://github.com/Harichandra1/finance-dashboard-zorvyn
+---
+
+## Problem
+
+A REST API for personal finance tracking needs to serve dashboard
+aggregations — summary totals, monthly trends, category breakdowns — behind
+real authentication. The easy way to build that in Spring Boot produces an
+API that quietly assumes its only client is a browser.
+
+## Context
+
+A solo project, ~1,850 lines of Java across 36 files: Spring Boot, Spring
+Security, Spring Data JPA, MySQL in production and H2 for tests, and
+springdoc-openapi for docs.
+
+## Decisions
+
+**A real security layer, not just a dependency.** Spring Security's default
+unauthenticated-request behavior is an HTML redirect to a login page — fine
+for a browser, useless for an API client, which just sees a redirect where
+it expected JSON. This service replaces that default with a
+`RestAuthenticationEntryPoint` and `RestAccessDeniedHandler` pair returning
+proper 401 and 403 JSON responses, backed by a custom `UserDetailsService`
+against the app's own `User` entity.
+
+**Aggregation pushed into SQL.** The dashboard's category totals and
+monthly trends are computed via interface-based JPA projections
+(`CategoryTotalProjection`, `MonthlyTrendProjection`) rather than loading
+full entities into Java and summing them in application code. Only the
+columns a projection actually needs cross the wire — a real performance
+decision, not a default.
+
+**Split request and response DTOs.** `UserRequest`, `UserUpdateRequest`, and
+`UserResponse` are separate types rather than one class reused in both
+directions, sub-packaged by concern (`dto/record/`, `dto/user/`,
+`dto/dashboard/`). That separation is what keeps a password hash from ever
+being able to leak through a response body — it can't serialize what the
+response type doesn't have a field for.
+
+## Implementation
+
+`@ControllerAdvice`-based global exception handling maps typed exceptions
+(`ResourceNotFoundException`, `BadRequestException`) to a consistent error
+schema. The package structure is genuinely layered —
+`controller/service/repository/model/dto/security/config/exception` — rather
+than one flat package. Integration tests run against H2 with
+`spring-security-test` wired in, alongside the standard application context
+test.
+
+## What I'd change
+
+The repo doesn't ship a `Dockerfile` yet, which is the difference between
+"clone and read" and "clone and run" for anyone evaluating it. That's next.

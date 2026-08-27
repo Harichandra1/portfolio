@@ -3,7 +3,7 @@ import { getAllEntries } from "@/lib/content/mdx";
 import { absoluteUrl } from "@/config/site";
 
 /** Static routes. Add a page and it belongs here. */
-const staticPaths = ["/", "/projects", "/blog", "/lab", "/about", "/uses", "/now"];
+const staticPaths = ["/", "/projects", "/blog", "/lab", "/about", "/now"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries = await getAllEntries();

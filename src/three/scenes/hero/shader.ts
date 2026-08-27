@@ -31,14 +31,18 @@ export const vertexShader = glsl`
 
 export const fragmentShader = glsl`
   uniform vec3 uColor;
+  uniform float uOpacity;
 
   varying float vAlpha;
 
   void main() {
     // Turn the square point sprite into a soft disc.
     float d = length(gl_PointCoord - 0.5);
-    float alpha = smoothstep(0.5, 0.12, d) * vAlpha;
+    float alpha = smoothstep(0.5, 0.12, d) * vAlpha * uOpacity;
 
+    // Placed after every multiply so a low uOpacity (light theme, normal
+    // blending) discards more fragments rather than fewer — cheaper, not
+    // just dimmer.
     if (alpha < 0.01) discard;
 
     gl_FragColor = vec4(uColor, alpha);

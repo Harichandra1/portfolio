@@ -8,7 +8,9 @@ import { cn } from "@/lib/utils";
  * accessibility tree instead of a real link plus a decoy overlay.
  *
  * Any nested interactive element (tags, external links) needs `relative z-10`
- * to sit above the stretched hit area.
+ * to sit above the stretched hit area. Depth comes only from the hairline
+ * border + a background-color delta on hover — no shadows anywhere, per
+ * CONVENTIONS.md.
  */
 export function LinkCard({
   className,
@@ -17,8 +19,8 @@ export function LinkCard({
   return (
     <article
       className={cn(
-        "group border-border bg-bg-elevated relative isolate rounded-lg border p-5",
-        "hover:border-border-strong transition-colors duration-(--dur-base)",
+        "group border-border bg-bg-elevated relative isolate rounded-(--radius-lg) border p-5",
+        "hover:border-border-strong transition-colors duration-(--duration-base)",
         "focus-within:border-accent",
         className,
       )}
@@ -37,7 +39,7 @@ export function CardTitle({
   className?: string;
 }) {
   return (
-    <h3 className={cn("text-fg text-base font-semibold tracking-tight", className)}>
+    <h3 className={cn("font-display text-fg text-xl", className)}>
       <Link href={href} className="before:absolute before:inset-0 before:z-0">
         {children}
       </Link>

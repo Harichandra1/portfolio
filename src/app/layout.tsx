@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -16,6 +16,15 @@ const sans = Geist({ subsets: ["latin"], variable: "--font-sans-var", display: "
 const mono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono-var",
+  display: "swap",
+});
+// Weight 400 only (all the family ships) — the display voice: hero H1, page
+// H1s, section display lines, the eval-lessons pull-quote. Never body copy.
+const display = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-display-var",
   display: "swap",
 });
 
@@ -36,8 +45,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0c" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0c0a" },
   ],
 };
 
@@ -46,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sans.variable} ${mono.variable}`}
+      className={`${sans.variable} ${mono.variable} ${display.variable}`}
     >
       <body className="min-h-dvh">
         <ThemeProvider>

@@ -24,6 +24,18 @@ export async function MdxContent({ source }: { source: string }) {
     source,
     components: mdxComponents,
     options: {
+      // next-mdx-remote defaults to stripping every `{}` JS expression from
+      // JSX attributes (blockJS: true) — a safeguard for MDX fetched from an
+      // untrusted remote source, which would otherwise let arbitrary code
+      // execute during render. All content here is authored locally and
+      // committed to this repo, never fetched at runtime, so that threat
+      // model doesn't apply and the default silently breaks components like
+      // <ResultsTable rows={[...]}> and <Stat value={...}> — every prop
+      // passed via `{}` came back `undefined`. `blockDangerousJS` (still
+      // default-on) keeps blocking real code-execution primitives — eval,
+      // Function, require, process, fs — so object/array literals in
+      // frontmatter-adjacent MDX are safe to allow through.
+      blockJS: false,
       // Frontmatter is parsed separately by lib/content/mdx.ts, so it has
       // already been stripped by the time the body reaches here.
       mdxOptions: {

@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
@@ -7,39 +7,64 @@ import { SceneView } from "@/three/canvas/scene-view";
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* The scene sits behind the copy and is purely decorative — the text
-          remains readable if it never loads.
+      {/*
+        A contained panel, not a full-bleed band — a signature in the corner
+        rather than a particle backdrop behind the copy. It never competes
+        with the text: the scene reads its own ink-toned --scene-* tokens
+        (see globals.css), not --accent, and fades to nothing toward the
+        text side via the mask below rather than a hard box edge.
 
-          Note: CSS opacity on this wrapper would not dim the scene. The 3D is
-          painted on the shared canvas, not by this element — only the poster
-          fallback and the gradient below are actually DOM. Adjust scene
-          intensity in the shader instead. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[36rem]" aria-hidden>
+        Note: CSS opacity on this wrapper would not dim the scene — the 3D
+        paints on the shared canvas, not by this DOM element. Adjust
+        intensity via --scene-opacity in globals.css or the shader itself.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 w-full max-w-[16rem] sm:max-w-[22rem] md:max-w-[28rem]"
+        style={{
+          maskImage: "linear-gradient(to left, black 45%, transparent 92%)",
+          WebkitMaskImage: "linear-gradient(to left, black 45%, transparent 92%)",
+        }}
+      >
         <SceneView name="hero" />
-        {/* Fades the scene into the page background at its lower edge. This one
-            does work on the canvas: it paints above it in normal flow. */}
-        <div className="to-bg absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent" />
       </div>
 
-      <Container width="wide" className="relative py-24 sm:py-32">
-        <p className="text-accent font-mono text-sm">{siteConfig.role}</p>
-
-        <h1 className="text-fg mt-4 max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-          {siteConfig.tagline}
-        </h1>
-
-        <p className="text-fg-muted mt-5 max-w-lg text-pretty">
-          {siteConfig.description}
+      <Container width="wide" className="relative py-16 sm:py-24 lg:py-32">
+        <p className="text-fg-subtle font-mono text-xs tracking-wide uppercase">
+          {siteConfig.role} · {siteConfig.location}
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <ButtonLink href="/projects">
-            See the work
+        <h1 className="font-display text-fg mt-5 max-w-2xl text-5xl text-balance sm:text-6xl">
+          {siteConfig.positioning}
+        </h1>
+
+        <p className="text-fg-muted mt-6 max-w-lg text-lg text-pretty">
+          Founding engineer at Metry AI, where I own the backend architecture and REST
+          APIs behind SOJO — a client-management platform for beauty and wellness
+          businesses across Asia. Outside work I build agent systems and the evaluation
+          harnesses that tell me whether they actually work.
+        </p>
+
+        <div className="mt-9 flex flex-wrap items-center gap-4">
+          <ButtonLink href="#work">
+            View work
             <ArrowRight aria-hidden />
           </ButtonLink>
-          <ButtonLink href="/about" variant="outline">
-            About me
+          <ButtonLink href={`mailto:${siteConfig.email}`} variant="outline">
+            <Mail aria-hidden />
+            Get in touch
           </ButtonLink>
+          {siteConfig.resumePath ? (
+            <ButtonLink
+              href={siteConfig.resumePath}
+              variant="ghost"
+              size="sm"
+              target="_blank"
+              className="font-mono text-xs tracking-wide uppercase"
+            >
+              Résumé — PDF
+            </ButtonLink>
+          ) : null}
         </div>
       </Container>
     </section>

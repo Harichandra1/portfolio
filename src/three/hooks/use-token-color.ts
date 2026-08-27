@@ -1,33 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Color } from "three";
+import { useTokenValue } from "./use-token-value";
 
 /**
  * Reads a colour token straight out of the CSS custom properties on <html>, so
  * scenes stay in step with the design system instead of hardcoding hex values.
- * Re-reads whenever next-themes swaps the `dark` class.
  *
  * Pass a token that holds a hex value (e.g. `--accent-hex`); three.js cannot
  * parse `oklch()`, which is why those mirrors exist in globals.css.
  */
 export function useTokenColor(token: `--${string}`, fallback = "#888888") {
-  const [color, setColor] = useState(() => new Color(fallback));
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    const read = () => {
-      const value = getComputedStyle(root).getPropertyValue(token).trim();
-      if (value) setColor(new Color(value));
-    };
-
-    read();
-
-    const observer = new MutationObserver(read);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, [token]);
-
-  return color;
+  const hex = useTokenValue(token, fallback);
+  // Memoise on the hex string so a re-render without a token change doesn't
+  // allocate a new three.js Color every time.
+  return useMemo(() => new Color(hex), [hex]);
 }

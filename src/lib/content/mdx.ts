@@ -65,7 +65,19 @@ export const getEntries = cache(
 
     return entries
       .filter((e) => !e.frontmatter.draft || process.env.NODE_ENV === "development")
-      .sort((a, b) => b.frontmatter.date.getTime() - a.frontmatter.date.getTime());
+      .sort((a, b) => {
+        // Curated `order` wins when present (e.g. Selected Work: flagship
+        // first, not just newest). Entries without it sort after every
+        // entry that has one, newest-date-first among themselves.
+        const ao = a.frontmatter.order;
+        const bo = b.frontmatter.order;
+        if (ao !== undefined || bo !== undefined) {
+          if (ao === undefined) return 1;
+          if (bo === undefined) return -1;
+          if (ao !== bo) return ao - bo;
+        }
+        return b.frontmatter.date.getTime() - a.frontmatter.date.getTime();
+      });
   },
 );
 

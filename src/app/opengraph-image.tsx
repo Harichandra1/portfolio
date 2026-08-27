@@ -22,14 +22,23 @@ export default function OpengraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 80,
-        backgroundColor: "#0a0a0c",
+        backgroundColor: "#0d0c0a",
         backgroundImage:
-          "radial-gradient(circle at 78% 12%, rgba(79,216,232,0.28) 0%, rgba(10,10,12,0) 55%)",
-        color: "#f4f4f5",
+          "radial-gradient(circle at 78% 12%, rgba(243,151,98,0.22) 0%, rgba(13,12,10,0) 55%)",
+        color: "#f6f4f2",
         fontFamily: "sans-serif",
       }}
     >
-      <div style={{ display: "flex", fontSize: 26, color: "#4fd8e8" }}>
+      <div
+        style={{
+          display: "flex",
+          fontSize: 24,
+          color: "#f39762",
+          fontFamily: "monospace",
+          letterSpacing: 2,
+          textTransform: "uppercase",
+        }}
+      >
         {siteConfig.role}
       </div>
 
@@ -43,16 +52,23 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             fontSize: 30,
-            color: "#a1a1aa",
+            color: "#b5b0aa",
             maxWidth: 820,
             lineHeight: 1.4,
           }}
         >
-          {siteConfig.tagline}
+          {siteConfig.positioning}
         </div>
       </div>
 
-      <div style={{ display: "flex", fontSize: 24, color: "#71717a" }}>
+      <div
+        style={{
+          display: "flex",
+          fontSize: 22,
+          color: "#8a857e",
+          fontFamily: "monospace",
+        }}
+      >
         {siteConfig.links.github.replace(/^https?:\/\//, "").replace(/\/$/, "")}
       </div>
     </div>,

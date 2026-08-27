@@ -1,0 +1,39 @@
+---
+title: E-Wallet Microservices
+summary: A digital wallet decomposed into four Spring Boot services communicating over Kafka, with per-service data ownership and dedicated consumer groups for wallet-creation and transaction-update events.
+date: 2025-10-09
+tags: [kafka, spring-boot, microservices, java]
+order: 3
+role: Course project — solo
+stack: [Java, "Spring Boot", "Apache Kafka", "Spring Data JPA", "Spring Security", MySQL]
+problem: A CRUD wallet app is one service; a real one needs transaction processing decoupled from balance updates and notifications.
+approach: Four Spring Boot services — user, wallet, transaction, notification — with per-service data ownership and two dedicated Kafka consumer groups.
+outcome: Four services, two consumer groups, and honest gaps named up front — no idempotency, no DLQ, not yet a production system.
+links:
+  repo: https://github.com/Harichandra1/E-WALLET-MICROSERVICES_JBDL
+---
+
+A course project (the package path is `org/gfg`, so this came out of a
+GeeksforGeeks-style curriculum), built solo. It decomposes a digital wallet
+into four Spring Boot services — user, wallet, transaction, and notification
+— communicating asynchronously over Kafka instead of direct HTTP calls
+between them.
+
+## Design decisions worth naming
+
+Each service owns its own data: separate repositories, separate DTO sets,
+nothing shared through a common entity. The wallet service runs two
+distinct consumers — one for wallet-creation events, one for
+transaction-update events — each with its own consumer group and
+deserializer, so the two event types can be processed and scaled
+independently rather than sharing one queue. Pre-transaction user validation
+sits in front of the transaction path, guarding against moving money for a
+user in a bad state.
+
+## What's missing
+
+Named honestly, not discovered by an interviewer: there's no
+`docker-compose.yml`, so running Kafka, MySQL, and four services locally
+takes manual setup. And there's no idempotency key or dead-letter handling
+on the consumers — if a transaction-update event replays, nothing today
+stops a double-credit. For a real wallet, that's the first thing I'd fix.

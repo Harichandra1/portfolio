@@ -5,8 +5,8 @@ import { EntryList } from "@/components/sections/entry-list";
 import type { SearchParams } from "@/types/routes";
 
 export const metadata = buildMetadata({
-  title: "Projects",
-  description: "Things I've designed, built, and shipped.",
+  title: "Work",
+  description: "Backend systems, agents, and the evaluation harnesses behind them.",
   path: "/projects",
 });
 
@@ -21,7 +21,10 @@ export default async function ProjectsPage({ searchParams }: SearchParams) {
 
   return (
     <>
-      <PageHeader title="Projects" lead="Things I've designed, built, and shipped." />
+      <PageHeader
+        title="Work"
+        lead="Backend systems, agents, and the evaluation harnesses behind them."
+      />
       <EntryList
         entries={entries}
         tags={tags}

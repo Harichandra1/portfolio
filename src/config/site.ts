@@ -7,38 +7,35 @@ export const siteConfig = {
   name: "Hari Chandra",
   /** Shown in the browser tab after the page title, e.g. "Projects · Hari Chandra" */
   shortName: "Hari",
-  role: "Software Engineer",
-  tagline: "I build things for the web — and occasionally in three dimensions.",
+  role: "Backend & AI Engineer",
+  tagline: "I build backends for AI products — and the evals that keep them honest.",
+  /** The hero H1. Kept separate from `tagline` so metadata copy (used in <title>,
+   *  OG cards) can stay a plain sentence while the hero can be a fuller line. */
+  positioning: "I build backends for AI products — and the evals that keep them honest.",
   description:
-    "Portfolio, writing, and experiments by Hari Chandra — software engineer working across web, graphics, and interaction.",
+    "Backend engineer in Hyderabad building production LLM systems — agentic RAG, evaluation harnesses, and the REST APIs and data models underneath them.",
   email: "cheetiharichandra2@gmail.com",
-  location: "India",
+  location: "Hyderabad, India",
   locale: "en_US",
 
-  /**
-   * Drop a PDF at public/resume.pdf and set this to "/resume.pdf" to show the
-   * download button on /about. Left null so the button is hidden rather than
-   * linking to a 404.
-   */
-  resumePath: null as string | null,
+  /** Path to the résumé PDF, shown as a download link on /about. */
+  resumePath: "/resume.pdf" as string | null,
 
   links: {
-    github: "https://github.com/",
-    linkedin: "https://www.linkedin.com/",
-    x: "https://x.com/",
+    github: "https://github.com/Harichandra1",
+    linkedin: "https://www.linkedin.com/in/harichandraprasad",
   },
 
   /** Primary navigation. Add a route here and it appears in header + footer. */
   nav: [
-    { href: "/projects", label: "Projects" },
-    { href: "/blog", label: "Blog" },
+    { href: "/projects", label: "Work" },
+    { href: "/blog", label: "Writing" },
     { href: "/lab", label: "Lab" },
     { href: "/about", label: "About" },
   ],
 
   /** Secondary links, footer only. */
   footerNav: [
-    { href: "/uses", label: "Uses" },
     { href: "/now", label: "Now" },
     { href: "/rss.xml", label: "RSS" },
   ],

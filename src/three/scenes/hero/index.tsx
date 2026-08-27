@@ -8,12 +8,14 @@ import {
   BufferAttribute,
   BufferGeometry,
   Group,
+  NormalBlending,
   ShaderMaterial,
 } from "three";
 import { useTokenColor } from "@/three/hooks/use-token-color";
+import { useTokenNumber } from "@/three/hooks/use-token-number";
 import { fragmentShader, vertexShader } from "./shader";
 
-const GRID = 64; // 64 x 64 = 4096 points
+const GRID = 48; // 48 x 48 = 2,304 points — a quieter field than the original 4,096
 const SPREAD = 16;
 
 /**
@@ -27,17 +29,28 @@ function hash(n: number) {
 }
 
 /**
- * Reference scene: a lattice of points rippling on a sine field, tinted with
- * the site's accent token and drifting with the pointer.
+ * The hero's signature scene: a lattice of points rippling on a sine field,
+ * drifting gently with the pointer.
  *
- * It is deliberately asset-free — nothing to download, nothing to 404 — so it
- * proves the whole 3D path (capability gate → shared canvas → view → poster
+ * Deliberately restrained, not a particle background: it reads its own
+ * `--scene-*` tokens (ink-toned, decoupled from `--accent` — see
+ * CONVENTIONS.md's one-accent-per-viewport rule) rather than the accent
+ * color, uses `AdditiveBlending` only on dark backgrounds where it can
+ * actually brighten something, and `NormalBlending` on light backgrounds
+ * where additive blending mathematically cannot darken or tint an
+ * already-near-white surface — that mismatch, not a tuning problem, is why
+ * this scene used to vanish in light mode.
+ *
+ * It's also asset-free — nothing to download, nothing to 404 — so it proves
+ * the whole 3D path (capability gate → shared canvas → view → poster
  * fallback) end to end without an art pipeline.
  */
 export default function HeroScene() {
   const group = useRef<Group>(null);
   const material = useRef<ShaderMaterial>(null);
-  const accent = useTokenColor("--accent-hex", "#0d93a3");
+  const sceneColor = useTokenColor("--scene-color-hex", "#514c46");
+  const opacity = useTokenNumber("--scene-opacity", 0.5);
+  const additive = useTokenNumber("--scene-additive", 0) >= 0.5;
 
   const geometry = useMemo(() => {
     const count = GRID * GRID;
@@ -65,26 +78,34 @@ export default function HeroScene() {
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uSize: { value: 26 },
-      uColor: { value: accent },
+      uSize: { value: 22 },
+      uColor: { value: sceneColor },
+      uOpacity: { value: opacity },
     }),
-    // `accent` is mutated in useFrame rather than recreated, so the uniform
-    // object only needs to be built once.
+    // `sceneColor`/`opacity` are pushed into the uniforms in useFrame rather
+    // than recreating this object, so it only needs to be built once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
   useFrame((state, delta) => {
     if (material.current) {
-      material.current.uniforms.uTime.value += delta;
-      material.current.uniforms.uColor.value = accent;
+      // Slower than a 1:1 clock — a quiet drift, not an obviously "live"
+      // animation loop.
+      material.current.uniforms.uTime.value += delta * 0.55;
+      material.current.uniforms.uColor.value = sceneColor;
+      material.current.uniforms.uOpacity.value = opacity;
+      // A plain property assignment — blending is GL draw-call state, not
+      // baked into the compiled program, so this needs no `needsUpdate`
+      // or recompilation, just the correct value each frame.
+      material.current.blending = additive ? AdditiveBlending : NormalBlending;
     }
 
     if (group.current) {
-      // Ease toward the pointer instead of tracking it rigidly.
+      // Ease toward the pointer, gently — a signature, not a toy.
       const { x, y } = state.pointer;
-      group.current.rotation.y += (x * 0.25 - group.current.rotation.y) * 0.03;
-      group.current.rotation.x += (-y * 0.12 + 0.42 - group.current.rotation.x) * 0.03;
+      group.current.rotation.y += (x * 0.12 - group.current.rotation.y) * 0.02;
+      group.current.rotation.x += (-y * 0.06 + 0.42 - group.current.rotation.x) * 0.02;
     }
   });
 
@@ -100,7 +121,7 @@ export default function HeroScene() {
             fragmentShader={fragmentShader}
             transparent
             depthWrite={false}
-            blending={AdditiveBlending}
+            blending={additive ? AdditiveBlending : NormalBlending}
           />
         </points>
       </group>

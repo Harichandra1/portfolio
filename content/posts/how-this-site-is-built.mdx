@@ -2,6 +2,7 @@
 title: How this site is built
 summary: The architecture behind this portfolio — one shared WebGL canvas, MDX content validated at build time, and a deliberate rule that adding anything is one file.
 date: 2026-08-04
+updated: 2026-08-27
 tags: [next.js, architecture, three.js]
 featured: true
 ---
@@ -52,8 +53,9 @@ Three gates sit in front of every scene:
 | No WebGL2 / low memory / save-data | Poster image, no WebGL             |
 | Scene throws at runtime            | Error boundary swaps in the poster |
 
-The poster is a static SVG. Worst case, the visitor sees a still image and the
-page is otherwise untouched.
+The poster is an inline SVG component reading the same design tokens the live
+scene does, so it stays in sync with light/dark mode with no JavaScript at all.
+Worst case, the visitor sees a still image and the page is otherwise untouched.
 
 ## What this buys
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { EntryCard } from "./entry-card";
+import { SectionHeading } from "./section";
 import type { AnyEntry } from "@/lib/content/schema";
 import { cn } from "@/lib/utils";
 
@@ -27,21 +27,18 @@ export function EntryShowcase({
   return (
     <section className="py-14">
       <Container width="wide">
-        <div className="mb-6 flex items-baseline justify-between gap-4">
-          <h2 className="text-fg-subtle text-sm font-semibold tracking-wide uppercase">
-            {title}
-          </h2>
-          <Link
-            href={href}
-            className="group text-fg-muted hover:text-fg inline-flex items-center gap-1.5 text-sm transition-colors"
-          >
-            {seeAllLabel}
-            <ArrowRight
-              className="size-3.5 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </Link>
-        </div>
+        <SectionHeading
+          action={
+            <Link
+              href={href}
+              className="text-fg-muted hover:text-fg font-mono text-xs tracking-wide uppercase transition-colors"
+            >
+              {seeAllLabel}
+            </Link>
+          }
+        >
+          {title}
+        </SectionHeading>
 
         <ul className={cn("grid gap-4", columns === 2 && "sm:grid-cols-2")}>
           {entries.map((entry) => (

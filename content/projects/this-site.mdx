@@ -1,0 +1,47 @@
+---
+title: This Site
+summary: The portfolio itself — an MDX content pipeline validated by Zod at build time, and a single shared WebGL canvas that's capability-gated and never blocks first paint.
+date: 2026-08-27
+tags: [nextjs, typescript, mdx, react-three-fiber]
+order: 5
+role: Solo
+scene: hero
+stack: [Next.js, TypeScript, "Tailwind CSS", MDX, "React Three Fiber", Zod]
+problem: A portfolio that's edited constantly needs adding a project to be one file, not a code change — and any 3D on it can't be allowed to break the site for visitors without WebGL.
+approach: A Zod-validated MDX content pipeline, and one shared, capability-gated WebGL canvas that every scene claims a rectangle of rather than mounting its own.
+outcome: Adding a project is one MDX file. The 3D layer ships zero bytes to a browser that can't render it — poster instead of canvas, every time.
+links:
+  repo: https://github.com/Harichandra1
+---
+
+This site, included honestly rather than left off — it's real, live, and
+shows a different range than the backend-heavy work elsewhere on this page.
+
+## The content pipeline
+
+Projects, posts, and lab notes are `.mdx` files with frontmatter validated
+by Zod at build time — a missing or mistyped field fails the build with the
+file name and the offending key, rather than shipping a broken page. Code
+blocks run through Shiki for syntax highlighting; a small scaffolding script
+(`pnpm new project my-thing`) generates a valid starting file so adding
+content never means re-deriving the schema by hand.
+
+## The 3D layer
+
+There's exactly one `<Canvas>` for the whole app, fixed behind the page.
+Components claim a rectangle of it with `<SceneView>` — the same mechanism
+this hero panel uses — rather than mounting their own WebGL context, which
+means the site never approaches the browser's context limit and scenes
+survive client-side navigation without re-initializing.
+
+Three gates sit in front of every scene: no WebGL2, low device memory or
+save-data mode, and `prefers-reduced-motion` all fall back to a static
+poster with zero WebGL created. The poster itself is an inline SVG reading
+the same design tokens the live scene does, so it repaints instantly on a
+theme toggle instead of relying on a `<img>` asset with its own `@media`
+query that can desync from a class-based dark-mode switch.
+
+<Scene
+  name="hero"
+  caption="The same panel from the homepage hero, embedded here as what it actually is: content."
+/>

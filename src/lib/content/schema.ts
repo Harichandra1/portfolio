@@ -25,13 +25,41 @@ const base = z.object({
   draft: z.boolean().default(false),
   /** Name of a scene in src/three/scenes/registry.ts. */
   scene: z.string().optional(),
+  /**
+   * Curated position, ascending. Work needs hand-picked order (the flagship
+   * first), not just recency — set this and the listing sorts by it instead
+   * of by `date`. Entries without it sort after every entry that has one,
+   * newest-`date`-first among themselves.
+   */
+  order: z.number().optional(),
 });
 
 export const projectSchema = base.extend({
   /** Pinned to the home page. */
   featured: z.boolean().default(false),
+  /**
+   * "case-study" gets the deep Problem→Lessons layout with a facts rail and
+   * numbered sections; "project" gets a lighter treatment. Set case-study
+   * only for work with enough real material to earn nine sections — padding
+   * a thin project into that shape reads worse than a confident short one.
+   */
+  kind: z.enum(["case-study", "project"]).default("project"),
   /** Short role/status line shown on cards, e.g. "Solo · Shipped 2026". */
   role: z.string().optional(),
+  /** Key into src/components/figures — the system-figure diagram for this
+   *  project's work row and case-study header. */
+  figure: z.string().optional(),
+  /** Display-only tech list, separate from `tags` (which drives filtering).
+   *  Order here is the order it renders in. */
+  stack: z.array(z.string()).default([]),
+  /** One-line challenge → solution → outcome, each optional but meant to
+   *  travel together. Keeping these as discrete fields makes the brief's
+   *  challenge/solution/outcome structure structural instead of something
+   *  prose has to remember — work rows render `problem`/`outcome` directly
+   *  without duplicating the case-study body. */
+  problem: z.string().max(200).optional(),
+  approach: z.string().max(200).optional(),
+  outcome: z.string().max(200).optional(),
   links: z
     .object({
       repo: link.optional(),

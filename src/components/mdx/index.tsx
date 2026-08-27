@@ -4,6 +4,9 @@ import type { MDXComponents } from "mdx/types";
 import { Callout } from "./callout";
 import { Figure, Video } from "./figure";
 import { Scene } from "./scene-embed";
+import { SystemFigure } from "./system-figure";
+import { ResultsTable } from "@/components/ui/results-table";
+import { Stat } from "@/components/ui/stat";
 
 /**
  * What MDX files are allowed to use.
@@ -34,4 +37,7 @@ export const mdxComponents: MDXComponents = {
   Figure,
   Video,
   Scene,
+  SystemFigure,
+  ResultsTable,
+  Stat,
 };

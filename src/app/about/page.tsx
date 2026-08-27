@@ -1,11 +1,13 @@
-import { Download, Mail } from "lucide-react";
-import { experience, education, type Role } from "@content/data/experience";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
+import { experience, education, certifications } from "@content/data/experience";
+import { skillGroups } from "@content/data/skills";
 import { Container } from "@/components/ui/container";
-import { ButtonLink } from "@/components/ui/button";
-import { Tag } from "@/components/ui/tag";
 import { PageHeader } from "@/components/sections/page-header";
+import { SectionHeading } from "@/components/sections/section";
+import { ExperienceTimeline } from "@/components/sections/experience-timeline";
+import { Skills } from "@/components/sections/skills";
+import { Contact } from "@/components/sections/contact";
 
 export const metadata = buildMetadata({
   title: "About",
@@ -23,130 +25,84 @@ function formatRange(start: string, end: string | null) {
   return `${fmt(start)} — ${end ? fmt(end) : "Present"}`;
 }
 
-function RoleItem({ role }: { role: Role }) {
-  return (
-    <li className="border-border relative border-l pb-8 pl-6 last:pb-0">
-      <span
-        className="bg-accent absolute top-1.5 -left-[4.5px] size-2 rounded-full"
-        aria-hidden
-      />
-
-      <div className="flex flex-wrap items-baseline gap-x-2">
-        <h3 className="text-fg font-medium">{role.title}</h3>
-        <span className="text-fg-subtle">at</span>
-        {role.url ? (
-          <a
-            href={role.url}
-            target="_blank"
-            rel="noreferrer"
-            className="text-fg decoration-border-strong hover:decoration-accent font-medium underline underline-offset-4"
-          >
-            {role.company}
-          </a>
-        ) : (
-          <span className="text-fg font-medium">{role.company}</span>
-        )}
-      </div>
-
-      <p className="text-fg-subtle mt-1 font-mono text-xs">
-        {formatRange(role.start, role.end)}
-        {role.location ? ` · ${role.location}` : ""}
-      </p>
-
-      <ul className="text-fg-muted mt-3 space-y-1.5 text-sm">
-        {role.highlights.map((h) => (
-          <li key={h} className="before:text-fg-subtle before:mr-2 before:content-['—']">
-            {h}
-          </li>
-        ))}
-      </ul>
-
-      {role.stack?.length ? (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          {role.stack.map((s) => (
-            <li key={s}>
-              <Tag>{s}</Tag>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </li>
-  );
-}
-
 export default function AboutPage() {
   return (
     <>
-      <PageHeader width="prose" title="About" lead={siteConfig.tagline}>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <ButtonLink href={`mailto:${siteConfig.email}`} size="sm">
-            <Mail aria-hidden />
-            Get in touch
-          </ButtonLink>
-          {siteConfig.resumePath ? (
-            <ButtonLink
-              href={siteConfig.resumePath}
-              variant="outline"
-              size="sm"
-              target="_blank"
-            >
-              <Download aria-hidden />
-              Resume
-            </ButtonLink>
-          ) : null}
-        </div>
-      </PageHeader>
+      <PageHeader width="prose" title="About" />
 
-      <Container width="prose" className="pb-16">
-        <section className="text-fg-muted text-[0.975rem]/7">
+      <Container width="prose" className="pb-8">
+        <div className="text-fg-muted space-y-4 text-lg">
           <p>
-            Replace this with a few sentences in your own voice: what you work on, what
-            you care about, and what you&rsquo;re looking for. Two short paragraphs is
-            plenty — the timeline below carries the detail.
+            I&rsquo;m a backend engineer in Hyderabad. I like the parts of a system that
+            are unglamorous and load-bearing: the data model, the query that got slow, the
+            retry that should have been idempotent, and the dashboard that tells you which
+            of those three is on fire.
           </p>
-        </section>
+          <p>
+            Right now I&rsquo;m a founding engineer at Metry AI, working asynchronously
+            with a team about ten hours away on SOJO — a client-management platform for
+            beauty and wellness businesses across Asia. I joined as a backend engineer and
+            moved onto the founding engineering team about three months in. Outside work I
+            build agent systems, mostly to find out where they break: my macOS
+            troubleshooting agent exists as much for its evaluation harness as for its
+            answers.
+          </p>
+        </div>
+      </Container>
 
-        <section className="mt-14">
-          <h2 className="text-fg-subtle mb-6 text-sm font-semibold tracking-wide uppercase">
-            Experience
-          </h2>
-          <ul>
-            {experience.map((role) => (
-              <RoleItem key={`${role.company}-${role.start}`} role={role} />
-            ))}
-          </ul>
-        </section>
+      <ExperienceTimeline roles={experience} />
+      <Skills groups={skillGroups} />
 
-        <section className="mt-14">
-          <h2 className="text-fg-subtle mb-6 text-sm font-semibold tracking-wide uppercase">
-            Education
-          </h2>
-          <ul className="space-y-4">
+      <section className="py-20">
+        <Container width="wide">
+          <SectionHeading>Education</SectionHeading>
+          <ul className="space-y-6">
             {education.map((e) => (
               <li key={e.school}>
-                <h3 className="text-fg font-medium">{e.credential}</h3>
+                <h3 className="text-fg text-xl font-semibold">{e.credential}</h3>
                 <p className="text-fg-muted mt-1 text-sm">{e.school}</p>
-                <p className="text-fg-subtle mt-1 font-mono text-xs">
+                <p className="text-fg-subtle text-2xs mt-1 font-mono tracking-wide uppercase">
                   {formatRange(e.start, e.end)}
+                  {e.note ? ` · ${e.note}` : ""}
                 </p>
               </li>
             ))}
           </ul>
-        </section>
+        </Container>
+      </section>
 
-        <section className="border-border bg-bg-subtle mt-14 rounded-lg border p-6">
-          <h2 className="text-fg font-medium">Contact</h2>
-          <p className="text-fg-muted mt-2 text-sm">
-            The fastest way to reach me is email — I read everything.
-          </p>
-          <a
-            href={`mailto:${siteConfig.email}`}
-            className="text-fg decoration-border-strong hover:decoration-accent mt-3 inline-block font-mono text-sm underline underline-offset-4"
-          >
-            {siteConfig.email}
-          </a>
-        </section>
-      </Container>
+      <section className="py-20">
+        <Container width="wide">
+          <SectionHeading>Certifications</SectionHeading>
+          <ul className="divide-border divide-y">
+            {certifications.map((c) => (
+              <li
+                key={c.name}
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3"
+              >
+                {c.url ? (
+                  <a
+                    href={c.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="decoration-border-strong hover:decoration-accent text-fg font-medium underline underline-offset-4"
+                  >
+                    {c.name}
+                  </a>
+                ) : (
+                  <span className="text-fg font-medium">{c.name}</span>
+                )}
+                <span className="text-fg-subtle text-2xs font-mono tracking-wide uppercase">
+                  {c.issuer}
+                  {c.status === "in-progress" ? " · In progress" : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <Contact />
     </>
   );
 }

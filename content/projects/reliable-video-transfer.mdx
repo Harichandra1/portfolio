@@ -1,0 +1,30 @@
+---
+title: Reliable Video Transfer over UDP
+summary: A hand-rolled reliability layer over raw UDP sockets in C — sequence numbering, acknowledgements, gap detection, and retransmission — built to understand what TCP does by implementing a subset of it.
+date: 2025-01-03
+tags: [c, networking, systems]
+order: 4
+role: Solo
+stack: [C, "POSIX sockets", pthreads]
+problem: UDP has no delivery guarantees; sending a video file over it means either accepting loss or building reliability yourself.
+approach: A client/server pair in C layering sequence numbers, ACKs, gap detection, and retransmission on top of raw UDP datagrams.
+outcome: 416 lines below the framework layer — the only project in the portfolio that isn't built on someone else's abstraction.
+links:
+  repo: https://github.com/Harichandra1/Robust-Video-Transfer
+---
+
+A client/server pair in C, 416 lines total, that transfers video files over
+raw UDP sockets and layers its own reliability mechanism on top —
+essentially a hand-rolled subset of what TCP gives you for free.
+
+Packets are sequence-numbered so the receiver can detect gaps and reorder
+arrivals; the server tracks per-packet delivery state and drives
+retransmission requests for anything missing. That asymmetry — the server
+does most of the ACK bookkeeping — matches a design where the receiver, not
+the sender, decides what's still outstanding.
+
+This is a learning exercise, not a production transfer tool, and I'd frame
+it that way in an interview rather than defending it as a real alternative
+to TCP: the honest answer to "why not just use TCP" is that the point was
+implementing the reliability layer myself, not shipping the fastest
+possible transfer.

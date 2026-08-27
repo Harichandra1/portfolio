@@ -31,7 +31,7 @@ export function EntryCard({ entry }: { entry: AnyEntry }) {
 
       <p className="text-fg-muted mt-2 text-sm text-pretty">{fm.summary}</p>
 
-      <div className="text-fg-subtle mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+      <div className="text-fg-subtle text-2xs mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono tracking-wide uppercase">
         <time dateTime={isoDate(fm.date)}>{formatDate(fm.date)}</time>
         {entry.type === "posts" ? <span>· {readingMinutes} min read</span> : null}
         {entry.type === "lab" ? <span>· {entry.frontmatter.status}</span> : null}
@@ -56,7 +56,7 @@ export function EntryCard({ entry }: { entry: AnyEntry }) {
           target="_blank"
           rel="noreferrer"
           // Sits above the stretched card link so it stays independently clickable.
-          className="text-fg-muted hover:text-fg relative z-10 mt-3 inline-block text-xs underline underline-offset-4"
+          className="text-fg-muted hover:text-fg text-2xs relative z-10 mt-3 inline-block font-mono tracking-wide uppercase underline underline-offset-4"
         >
           {outbound.label}
         </a>

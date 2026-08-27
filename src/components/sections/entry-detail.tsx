@@ -6,13 +6,14 @@ import { Tag } from "@/components/ui/tag";
 import { MdxContent } from "@/components/mdx/mdx-content";
 import { SceneView } from "@/three/canvas/scene-view";
 import { isSceneName } from "@/three/scenes/names";
+import { CaseStudy } from "./case-study";
 import { formatDate, isoDate } from "@/lib/utils";
 import type { AnyEntry } from "@/lib/content/schema";
 
 /**
- * The shared shell for every content detail page. Adding a new content type
- * means writing a route that fetches the entry and hands it to this — the
- * header, scene banner, body, and metadata all come for free.
+ * The shared shell for every content detail page. Routes to the deep
+ * `CaseStudy` layout for a project with `kind: "case-study"`; everything
+ * else (posts, lab notes, lighter projects) gets this lighter shell.
  */
 export async function EntryDetail({
   entry,
@@ -23,11 +24,16 @@ export async function EntryDetail({
   backHref: string;
   backLabel: string;
 }) {
+  if (entry.type === "projects" && entry.frontmatter.kind === "case-study") {
+    return <CaseStudy entry={entry} backHref={backHref} />;
+  }
+
   const fm = entry.frontmatter;
   const links = entry.type === "posts" ? undefined : entry.frontmatter.links;
+  const stack = entry.type === "projects" ? entry.frontmatter.stack : [];
 
   const outbound = [
-    links?.live && { href: links.live, label: "Live site" },
+    links?.live && { href: links.live, label: "Live" },
     links?.repo && { href: links.repo, label: "Source" },
     entry.type === "projects" &&
       entry.frontmatter.links.writeup && {
@@ -47,20 +53,31 @@ export async function EntryDetail({
           {backLabel}
         </Link>
 
-        <h1 className="text-fg mt-6 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+        <h1 className="font-display text-fg mt-6 text-4xl text-balance sm:text-5xl">
           {fm.title}
         </h1>
 
-        <p className="text-fg-muted mt-3 text-pretty">{fm.summary}</p>
+        <p className="text-fg-muted mt-4 text-lg text-pretty">{fm.summary}</p>
 
-        <div className="text-fg-subtle mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+        <div className="text-fg-subtle mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs tracking-wide uppercase">
           <time dateTime={isoDate(fm.date)}>{formatDate(fm.date)}</time>
           {fm.updated ? <span>· updated {formatDate(fm.updated)}</span> : null}
           {entry.type === "posts" ? <span>· {entry.readingMinutes} min read</span> : null}
           {entry.type === "lab" ? <span>· {entry.frontmatter.status}</span> : null}
+          {entry.type === "projects" && entry.frontmatter.role ? (
+            <span>· {entry.frontmatter.role}</span>
+          ) : null}
         </div>
 
-        {fm.tags.length > 0 ? (
+        {stack.length > 0 ? (
+          <ul className="mt-4 flex flex-wrap gap-1.5">
+            {stack.map((s) => (
+              <li key={s}>
+                <Tag>{s}</Tag>
+              </li>
+            ))}
+          </ul>
+        ) : fm.tags.length > 0 ? (
           <ul className="mt-4 flex flex-wrap gap-1.5">
             {fm.tags.map((tag) => (
               <li key={tag}>
@@ -91,7 +108,7 @@ export async function EntryDetail({
           fallback when 3D isn't available. */}
       {fm.scene && isSceneName(fm.scene) ? (
         <Container width="wide" className="mt-10">
-          <div className="border-border bg-bg-subtle aspect-[16/7] overflow-hidden rounded-xl border">
+          <div className="border-border bg-bg-subtle aspect-[16/7] overflow-hidden rounded-(--radius-lg) border">
             <SceneView name={fm.scene} />
           </div>
         </Container>

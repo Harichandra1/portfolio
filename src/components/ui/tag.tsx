@@ -2,8 +2,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const base =
-  "inline-flex items-center gap-1 rounded-full border border-border bg-bg-subtle px-2.5 py-0.5 " +
-  "font-mono text-xs text-fg-muted";
+  "inline-flex items-center gap-1.5 rounded-(--radius-sm) border border-border bg-bg-subtle " +
+  "px-2 py-0.5 font-mono text-2xs tracking-wide text-fg-muted uppercase";
 
 export function Tag({ className, ...props }: React.ComponentPropsWithoutRef<"span">) {
   return <span className={cn(base, className)} {...props} />;

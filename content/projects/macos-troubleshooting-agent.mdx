@@ -1,0 +1,152 @@
+---
+title: macOS Troubleshooting Agent
+summary: An agentic RAG system for macOS troubleshooting — a branching LangGraph, a domain knowledge base built from 9 scrapers, and a blind-judge evaluation harness that blocks its own deploys on quality regressions.
+date: 2026-07-27
+tags: [langgraph, agentic-rag, evaluation, fastapi, python]
+kind: case-study
+order: 1
+role: Solo — design, build, deploy, evaluate
+figure: agent-graph
+stack:
+  [
+    Python,
+    LangGraph,
+    FastAPI,
+    Qdrant,
+    "Llama 3.3 70B",
+    PostgreSQL,
+    Docker,
+    Prometheus,
+    Grafana,
+    "Oracle Cloud",
+  ]
+problem: Generic assistants guess at macOS fixes; knowledge is scattered across forums, and most tools lead with "have you restarted it" before real diagnosis.
+approach: A branching LangGraph agent grounded in a 9-source knowledge base, with confidence-gated web fallback and a blind-judge evaluation harness that gates its own deploys.
+outcome: Resolved 2 of 4 multi-turn cases faster than GPT-4o (n=4) — and an eval that's just as honest about where it loses.
+links:
+  repo: https://github.com/Harichandra1/macos-agent
+  live: https://macos-agent-hari.duckdns.org
+---
+
+## Problem
+
+macOS troubleshooting knowledge is scattered across forums, Stack Overflow,
+and man pages. Generic assistants guess at fixes, or lead with "have you
+tried restarting it" without ever asking what a user has already ruled out.
+
+## Context
+
+A solo project — Python, LangGraph, FastAPI, Qdrant, Llama 3.3 70B,
+PostgreSQL, Docker, and Oracle Cloud, at roughly 17,500 lines of code, [live
+at macos-agent-hari.duckdns.org](https://macos-agent-hari.duckdns.org).
+
+## Role
+
+Solo: design, build, deploy, and evaluate.
+
+## Exploration
+
+The write path is nine custom scrapers pulling from Apple Developer Forums,
+Ask Different, Stack Overflow, Reddit, WWDC, man pages, dev docs, and GitHub
+— cleaned, tagged, and chunked one problem per document. The open question
+wasn't how to retrieve; it was when to stop trusting the knowledge base and
+go outside it.
+
+## Decisions
+
+- **A branching graph, not a linear chain.** `intake → {kb_retrieve,
+web_search} → smart_merge → decide`, where `decide` branches three ways:
+  answer directly, ask a clarifying question, or request a diagnostic from
+  the user. That three-way branch isn't expressible as a straight-line RAG
+  pipeline.
+- **Confidence-gated web fallback.** A Tavily search scoped to apple.com
+  fires only when knowledge-base retrieval confidence is low — RAG-first,
+  not search-first.
+- **Difficulty-tier triage.** Every knowledge-base entry carries a
+  difficulty tier, so the agent can infer what a user has likely already
+  tried instead of leading with the easiest step every time.
+- **Stateful multi-turn memory.** macOS version, chip, and already-tried
+  steps accumulate into a running case file across turns, persisted via
+  `langgraph-checkpoint-postgres` so it survives a restart or redeploy
+  instead of living in process memory.
+- **Cross-provider LLM failover** across Groq, NVIDIA, and OpenRouter, so a
+  single provider outage doesn't take the agent down mid-conversation.
+
+## Implementation
+
+Production concerns that don't usually show up in a portfolio project:
+Google OAuth into session JWTs, PII redaction and prompt-abuse guardrails,
+per-turn token and cost accounting with weekly and monthly spend caps, rate
+limiting via `slowapi`, Alembic migrations run on boot, Prometheus and
+Grafana dashboards with structured logs shipped through Loki, GitHub Actions
+CI, and deploy/rollback/recover scripts backed by a smoke test. Nine test
+modules cover auth, credits, guardrails, and the async Postgres checkpointer.
+
+## Challenges
+
+The hardest part wasn't the agent graph — it was trusting the agent's own
+opinion of itself.
+
+<SystemFigure
+  name="eval-gate"
+  caption="regression_gate.py: two judge models score a candidate build blind, against a committed baseline. A score below baseline blocks the deploy outright."
+/>
+
+Two judge models score every candidate build blind — without seeing each
+other's scores — across correctness, actionability, grounding, and
+depth-triage, and the result is checked against a committed `baseline.json`.
+If a change makes the agent measurably worse, the deploy is blocked, not
+just flagged.
+
+## Results
+
+This hasn't shipped to real users, so there's no traffic graph here — the
+honest results are the eval's, not a usage dashboard.
+
+<ResultsTable
+  caption="Eval harness results — both benchmarks"
+  subjectLabel="Agent"
+  baselineLabel="GPT-4o"
+  rows={[
+    {
+      label: "Multi-turn resolution (n=4)",
+      subject: "2 / 4",
+      baseline: "1 / 4",
+      winner: "subject",
+    },
+    {
+      label: "Avg. turns to resolve (n=4)",
+      subject: "2.25",
+      baseline: "3.25",
+      winner: "subject",
+    },
+    {
+      label: "Single-shot head-to-head (n=6)",
+      subject: "1 win / 5 losses",
+      baseline: "5 wins / 1 loss",
+      winner: "baseline",
+    },
+  ]}
+  note="Judged blind — judges never saw each other's scores. A second judge model scored the single-shot set 0 wins out of 3 for the agent. Both sample sizes are small: treat this as a signal, not a verdict."
+/>
+
+## What the eval told me
+
+I built the judge panel expecting it to confirm the agent was good. It
+didn't.
+
+On single-shot questions — one prompt, one answer, no follow-up — GPT-4o
+beat my agent in 5 of 6 cases. A 70B model with retrieval does not
+out-recall a frontier model, and my own eval said so plainly.
+
+On multi-turn diagnosis, which is what the product actually does, the
+numbers inverted: the agent resolved 2 of 4 cases in an average of 2.25
+turns; GPT-4o resolved 1 of 4 in 3.25. Four cases, run interactively —
+treat that as a signal, not a result.
+
+The split is the finding. The agent's advantage isn't knowing more; it's
+asking for the one diagnostic it's missing instead of guessing, and
+remembering what you already tried. Building the harness is what lets me
+say that with a straight face — and it's why `regression_gate.py` blocks a
+deploy when scores fall below the committed baseline. I'd rather have a red
+build than a quieter, worse agent.
