@@ -62,6 +62,14 @@
   --dur-slow: 500ms;
   --dur-enter: 420ms;
 
+  /* Book pages are paper in both themes. A book doesn't invert when the site
+     does — the page slabs in src/components/books/book.tsx read these, and
+     they are deliberately NOT redefined under .dark. */
+  --paper: var(--ink-50);
+  --paper-shade: var(--ink-100);
+  --paper-deep: var(--ink-200);
+  --paper-line: var(--ink-300);
+
   /* Radius — deliberately small. Large soft radii read consumer-app; small
      ones read instrument/editorial. Never use rounded-full except on the
      theme-toggle icon button. */
@@ -110,6 +118,11 @@
   --color-accent-fg: var(--accent-fg);
   --color-accent-subtle: color-mix(in oklch, var(--accent) 12%, transparent);
   --color-ring: var(--ring);
+
+  --color-paper: var(--paper);
+  --color-paper-shade: var(--paper-shade);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-line: var(--paper-line);
 
   --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-var), ui-monospace, SFMono-Regular, monospace;

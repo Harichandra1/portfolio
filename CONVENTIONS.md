@@ -174,6 +174,35 @@ adding a new accent use anywhere (a badge, a highlight, a scene tint), check
 what's already claiming the accent in that view and use a hairline border,
 a background-color delta, or plain `--fg`/`--fg-muted` weight instead.
 
+## Adding a book
+
+`content/data/books.ts`. One rule, and the type system enforces it:
+**`takeaway` is required.** If you can't write a sentence about what a book
+changed in how you work or think, it doesn't go on the shelf — regardless of
+genre. A wall of covers with nothing said about them is a list of purchases;
+a short shelf with a real line under each is a sample of how you think, which
+is the only version worth putting on a hiring-facing site. The rule is
+genre-blind on purpose: Meditations earns its place under it and a generic
+productivity title doesn't.
+
+Covers are optional. Drop a file in `public/covers/` and set
+`cover: "/covers/name.webp"`; anything without one renders a typographic
+cover in the site's own serif and mono, so a missing image never leaves a
+hole in the grid.
+
+The 3D book in [book.tsx](src/components/books/book.tsx) is four layers on
+the Z axis inside a `preserve-3d` container, each rotating further than the
+one beneath it on hover. Two things to know before editing it:
+
+- **Page slabs read `--paper-*`, never `--bg-*`.** Those tokens are defined
+  once in `:root` and deliberately not redefined under `.dark` — a book's
+  pages are paper in both themes and shouldn't invert when the site does.
+  Pointing them at theme tokens was the first version's bug: the pages went
+  dark in dark mode and the effect vanished.
+- **The transforms are written out longhand, not generated in a loop.**
+  Tailwind scans source for complete class strings, so an arbitrary value
+  built from a variable at runtime produces no CSS at all.
+
 ## Receipts
 
 Claims on this site carry evidence. `content/data/claims.ts` is the registry;

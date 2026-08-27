@@ -36,6 +36,7 @@ export const siteConfig = {
 
   /** Secondary links, footer only. */
   footerNav: [
+    { href: "/books", label: "Books" },
     { href: "/now", label: "Now" },
     { href: "/rss.xml", label: "RSS" },
   ],
