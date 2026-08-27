@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Caveat, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -20,6 +20,13 @@ const mono = Geist_Mono({
 });
 // Weight 400 only (all the family ships) — the display voice: hero H1, page
 // H1s, section display lines, the eval-lessons pull-quote. Never body copy.
+// The marker hand — sticker labels and margin notes only, never body copy
+// or anything load-bearing. See CONVENTIONS.md.
+const hand = Caveat({
+  subsets: ["latin"],
+  variable: "--font-hand-var",
+  display: "swap",
+});
 const display = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
@@ -55,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sans.variable} ${mono.variable} ${display.variable}`}
+      className={`${sans.variable} ${mono.variable} ${display.variable} ${hand.variable}`}
     >
       <body className="min-h-dvh">
         <ThemeProvider>

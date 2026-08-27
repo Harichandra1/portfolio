@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/sections/page-header";
 import { SectionHeading } from "@/components/sections/section";
 import { Book3D } from "@/components/books/book";
+import { Sticker } from "@/components/stickers/sticker";
+import { Note } from "@/components/stickers/note";
 
 export const metadata = buildMetadata({
   title: "Books",
@@ -16,11 +18,24 @@ export default function BooksPage() {
   const total = bookCount();
 
   return (
-    <>
+    <div className="relative">
+      <Sticker
+        name="book"
+        className="top-4 right-[6%] hidden w-20 rotate-[9deg] lg:block"
+      />
+      <Sticker
+        name="chai"
+        className="top-64 right-[3%] hidden w-16 -rotate-[11deg] xl:block"
+      />
+
       <PageHeader
         title="Books"
         lead="Not everything I've read — the ones I can say something specific about. If I can't write what a book changed, it isn't on the shelf."
-      />
+      >
+        <Note className="mt-5" arrow="left">
+          the takeaway is the price of admission
+        </Note>
+      </PageHeader>
 
       <Container width="wide" className="pb-16">
         {total === 0 ? (
@@ -46,6 +61,6 @@ export default function BooksPage() {
           </div>
         )}
       </Container>
-    </>
+    </div>
   );
 }

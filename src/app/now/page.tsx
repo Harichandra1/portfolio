@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/sections/page-header";
 import { formatDate, isoDate } from "@/lib/utils";
+import { Sticker } from "@/components/stickers/sticker";
 
 export const metadata = buildMetadata({
   title: "Now",
@@ -12,7 +13,12 @@ export const metadata = buildMetadata({
 
 export default function NowPage() {
   return (
-    <>
+    <div className="relative">
+      <Sticker
+        name="terminal"
+        className="top-6 right-[7%] hidden w-20 rotate-[7deg] lg:block"
+      />
+
       <PageHeader width="prose" title="Now" lead={now.intro}>
         <p className="text-fg-subtle mt-4 font-mono text-xs">
           Last updated{" "}
@@ -54,6 +60,6 @@ export default function NowPage() {
           .
         </p>
       </Container>
-    </>
+    </div>
   );
 }

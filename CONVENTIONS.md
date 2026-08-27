@@ -165,6 +165,43 @@ Rules that keep these from turning into clip art:
   frontmatter field (work-row thumbnail + case-study header) or inline via
   `<SystemFigure name="...">` in the MDX body.
 
+## Stickers and the marker hand
+
+`src/components/stickers/` — die-cut stickers, plus `Note` for a handwritten
+margin aside in Caveat (`font-hand`).
+
+**Where they go, and where they don't.** Stickers live on the personality
+pages — `/books`, `/lab`, `/now`, `404`. They are deliberately absent from
+the case studies, `/about`'s experience section, and anything carrying a
+number. A sushi sticker beside an honest account of losing a benchmark
+doesn't add warmth, it costs credibility; the pages that do the hiring work
+stay severe on purpose. If a page has to be believed, it doesn't get a
+sticker.
+
+**Rules:**
+
+- Artwork is **original**, drawn in `art.tsx`. The stickers on the site that
+  inspired this (a Nike Dunk, Chrome's dinosaur) are other people's
+  trademarked artwork — and a sticker lifted from another portfolio says
+  nothing about whose portfolio this is. Draw something about the person.
+- Stickers are `aria-hidden` and `pointer-events-none`. They are decoration,
+  they must never intercept a click, and they must never carry information
+  that isn't also in text.
+- `--sticker-*` colours are fixed in both themes, like `--paper-*`. Vinyl
+  doesn't invert when the site does. They are the only saturated colours on
+  the site and are **exempt from the one-accent rule**, because they read as
+  objects rather than as UI.
+- Most are `hidden lg:block` — a phone has no spare margin to stick things
+  in, and a sticker overlapping body copy is worse than no sticker. Verify
+  no horizontal overflow at every breakpoint you enable one at.
+- **`.sticker` is the site's one sanctioned shadow.** The no-shadows rule
+  exists so UI depth comes from hairlines rather than elevation; a sticker
+  is a physical object sitting on the page and the shadow is what makes the
+  metaphor legible. It is not a licence to reintroduce shadows elsewhere.
+- `font-hand` (Caveat) is for sticker labels and `Note` only — never body
+  copy, headings, nav, or anything load-bearing. If a sentence has to be
+  read for the page to make sense, it belongs in the body font.
+
 ## One accent per viewport
 
 `--accent` marks the primary CTA, the active nav item, one figure element,

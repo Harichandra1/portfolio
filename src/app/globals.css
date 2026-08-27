@@ -70,6 +70,21 @@
   --paper-deep: var(--ink-200);
   --paper-line: var(--ink-300);
 
+  /* Sticker palette. Fixed in both themes and deliberately NOT redefined
+     under .dark, for the same reason as --paper-*: a sticker is a physical
+     object stuck onto the page, and vinyl doesn't invert when the site
+     does. These are the only saturated colours on the site — they're
+     exempt from the one-accent-per-viewport rule because they read as
+     objects, not as UI. */
+  --sticker-edge: #fdfcfa;
+  --sticker-ink: #2a2622;
+  --sticker-cream: #f3ece0;
+  --sticker-red: #c8402f;
+  --sticker-amber: #d98324;
+  --sticker-orange: #e8892b;
+  --sticker-yellow: #f0c33c;
+  --sticker-green: #6fcf6a;
+
   /* Radius — deliberately small. Large soft radii read consumer-app; small
      ones read instrument/editorial. Never use rounded-full except on the
      theme-toggle icon button. */
@@ -127,6 +142,7 @@
   --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-var), ui-monospace, SFMono-Regular, monospace;
   --font-display: var(--font-display-var), ui-serif, Georgia, serif;
+  --font-hand: var(--font-hand-var), ui-rounded, cursive;
 
   --ease-out-quint: var(--ease-out-quint);
   --duration-fast: var(--dur-fast);
@@ -241,6 +257,26 @@
 }
 
 @layer utilities {
+  /*
+   * The die-cut sticker look: a white vinyl edge tracing the silhouette,
+   * plus one soft shadow so it reads as sitting ON the page.
+   *
+   * Stacked zero-offset drop-shadows build the outline — a filter follows
+   * the rendered silhouette, so this works on any artwork without hand-
+   * computing an outline path for each one.
+   *
+   * This is the site's ONE sanctioned shadow (see CONVENTIONS.md). The
+   * no-shadows rule exists so UI depth comes from hairlines instead of
+   * elevation; a sticker is a physical object and the shadow is what makes
+   * the metaphor legible, not decoration standing in for structure.
+   */
+  .sticker {
+    filter: drop-shadow(0 0 1.5px var(--sticker-edge))
+      drop-shadow(0 0 1.5px var(--sticker-edge))
+      drop-shadow(0 0 1.5px var(--sticker-edge))
+      drop-shadow(0 0 1.5px var(--sticker-edge)) drop-shadow(0 3px 4px rgb(0 0 0 / 0.28));
+  }
+
   /* Shown only to screen readers — used for skip links and icon-button labels. */
   .sr-only-focusable:not(:focus):not(:focus-within) {
     position: absolute;
