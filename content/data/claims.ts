@@ -169,6 +169,63 @@ export const claims = {
     kind: "self-reported",
   },
 
+  // ------------------------------------------------------- coding harness
+  //
+  // Every claim in this group is self-reported, and that is not an oversight:
+  // the harness lives in a local repo that has not been pushed anywhere, so
+  // the result files backing these numbers are on my machine. Rather than
+  // leave the project off the site or dress the numbers up as checkable, the
+  // claims say plainly that you cannot check them yet.
+  "harness-swebench": {
+    assertion:
+      "A clean run of the harness resolved 38 of 50 SWE-bench Verified Mini instances, one attempt each.",
+    evidence:
+      "Graded by the official SWE-bench grader on the published evaluation images (run id full50-2026-10-18): 50 completed, 38 resolved, 0 errors, 0 empty patches. The report file is on my machine, not in a public repo.",
+    kind: "self-reported",
+    caveat:
+      "The prompt includes the names of the failing tests and the test command, which agents on the public leaderboard are not given — so this number is not comparable with leaderboard results. The model is also pinned to temperature 1, so expect a point or two of run-to-run variance.",
+  },
+  "harness-first-pass": {
+    assertion:
+      "The first graded pass resolved 26 of 50, and 14 of those 24 failures were the grading environment rather than the agent.",
+    evidence:
+      "I read every report.json and test_output.txt against the gold patches. Twelve Sphinx 3.x instances died at pytest collection because docutils 0.22 dropped docutils.utils.roman, and two more broke on a Pygments whitespace-token change. Three of those patches were byte-identical to the gold patch.",
+    kind: "self-reported",
+    caveat:
+      "This is my own account of debugging my own run. Ask me to walk through a specific instance.",
+  },
+  "harness-sandbox": {
+    assertion:
+      "Every command the agent runs executes in a per-run container with networking disabled and the workspace path-jailed.",
+    evidence:
+      "One container per agent run, built from the instance's own image, with the repository bind-mounted and docker exec per command. Stale containers are cleaned up on exit.",
+    kind: "self-reported",
+  },
+  "harness-custom-eval": {
+    assertion:
+      "The 18-task custom eval is required to fail on the unmodified repository before it can score anything.",
+    evidence:
+      "A --validate mode runs the suite against the stock toy repo and refuses the suite if any task already passes, so it cannot be vacuously green. Two of the tasks are adversarial: the prompt names the wrong file.",
+    kind: "self-reported",
+  },
+  "harness-judge": {
+    assertion:
+      "With three attempts per instance and a blind judge picking one, 7 of 12 hard instances resolved — and some candidate passed on 8.",
+    evidence:
+      "Three independent agents per instance, each in its own workspace; after each one the harness reverts the agent's test edits and re-runs the repo's test command, so the judge sees what newly fails rather than the agent's own summary. Every candidate is graded too, so the judge's picks can be scored against what was available.",
+    kind: "self-reported",
+    caveat:
+      "Two judge revisions disagreed on the same inputs, so a single judge sample is noise — the final judge votes three times. Tuning a judge on graded candidates is tuning on the test set, which limits what that 7 means.",
+  },
+  "harness-never-solved": {
+    assertion: "Four of the 50 instances were never solved in any configuration I ran.",
+    evidence:
+      "Four single runs and one best-of-three. In each of the four, the hidden test asserts something the issue text does not contain — exact Itanium-ABI manglings of C++ user-defined literals, SWIG-style signature continuations, index layout, and a feature the maintainers shipped on by default while the thread called it optional.",
+    kind: "self-reported",
+    caveat:
+      "Named here because a harness that claims a path to 50 of 50 is claiming the issue text contains information it does not.",
+  },
+
   // ------------------------------------------------------ finance-dashboard
   "finance-json-401": {
     assertion:

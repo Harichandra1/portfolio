@@ -1,0 +1,166 @@
+---
+title: Coding-Agent Harness
+summary: A coding agent built on LangGraph from scratch — a planner, a ReAct tool loop, and a network-disabled Docker sandbox — graded against 50 real Django and Sphinx issues from SWE-bench Verified Mini.
+date: 2026-10-18
+tags: [langgraph, agents, evaluation, swe-bench, python]
+kind: case-study
+order: 2
+role: Solo — design, build, benchmark
+figure: harness-loop
+stack: [Python, LangGraph, Docker, Modal, "SWE-bench", pytest, "gpt-6-luna"]
+problem: Reading about agent harnesses teaches you the diagram. It doesn't tell you where one breaks on a repository you didn't write.
+approach: A planner node, a ReAct loop over read/write/edit/bash, every command inside a per-run container with no network — then graded on 50 real GitHub issues.
+outcome: 38 of 50 resolved on the clean run — and 14 of the first pass's 24 failures turned out to be the grader, not the agent.
+---
+
+## Problem
+
+Every agent framework ships a diagram of a tool loop, and the diagram is the
+easy part. What a diagram can't tell you is what happens when the agent is
+pointed at a repository nobody wrote for it — a real Django or Sphinx
+checkout, a real bug report, and a hidden test it never sees.
+
+So I built the harness myself rather than wiring up someone else's, and
+graded it on [SWE-bench Verified
+Mini](https://github.com/SWE-bench/SWE-bench): 50 genuine GitHub issues,
+scored by the project's own grader against tests the agent is never shown.
+
+## Context
+
+A solo project in Python on LangGraph, with Docker for isolation, Modal for
+the first round of grading, and pytest underneath the custom eval.
+
+One thing to say before any number below: **the repository isn't public
+yet.** Every claim on this page is marked as self-reported for that reason —
+the result files are on my machine, and until I push the repo you have no way
+to check them. I'd rather say that plainly than style an unverifiable number
+to look like a verifiable one.
+
+## Role
+
+Solo: the graph, the tools, the sandbox, the eval suite, and the grading
+runs.
+
+## Exploration
+
+The first design question wasn't which model to use — it was how much rope
+to give the loop. An agent with unrestricted `bash` and an unbounded number
+of turns will eventually do something expensive, destructive, or both: `pip
+install` the world, rewrite a test to make it pass, or spin for forty turns
+on a file it misread.
+
+So the limits came first and the capability second.
+
+## Decisions
+
+- **A planner, then a ReAct loop.** A planner node writes a short step plan
+  before any tool runs, then the loop alternates model turns with tool calls
+  — `read`, `write`, `edit`, `bash` — under a hard cap on LLM calls so a
+  confused run ends instead of grinding.
+- <Claim id="harness-sandbox">**Isolation before capability.**</Claim> Each run gets its
+  own container, built from the instance's own image, with the workspace bind-mounted, the
+  path jailed to the repository, and networking switched off. The agent can compile and
+  run tests; it cannot reach the internet or the host.
+- **Submit the diff, nothing else.** Agent-written scratch files and
+  agent-written tests are dropped from the patch. Gold patches never touch
+  tests, and an agent that gets to ship its own test has graded its own
+  homework.
+- <Claim id="harness-custom-eval">**An eval that has to fail first.**</Claim>
+  Alongside the benchmark there's an 18-task suite against a toy repo, scored by pytest
+  rather than a model — and a validate mode that refuses the suite if any task already
+  passes on the unmodified repo. A green suite that was always green measures nothing.
+
+## Implementation
+
+Two implementation details did more for the score than any prompt change.
+
+`read` used to head/tail-truncate anything over 8k characters, which meant
+the agent never saw the middle of a large file — it was editing
+`autodoc/__init__.py` from its first and last pages. It now pages by line
+range.
+
+And `bash` originally ran in a bare `python:3.11-slim` with no project
+dependencies, so `import django` failed and the agent never ran a single
+test before submitting. It now runs inside the instance's own image with the
+repo's environment active. Roughly five failures were the agent working
+blind for exactly that reason.
+
+## Challenges
+
+<SystemFigure
+  name="harness-loop"
+  caption="One container per run, built from the repository's own image, with networking disabled and the workspace path-jailed. The loop is ordinary; the box around it is the decision."
+/>
+
+The hardest part of this project was not the agent. It was learning to
+read a failing grade.
+
+<Claim id="harness-first-pass">
+  The first graded pass came back at 26 of 50, and 14 of those 24 failures turned out to
+  be the grading environment rather than the agent
+</Claim>
+. The grading path rebuilt every image from scratch against current releases: `docutils`
+0.22 had dropped `docutils.utils.roman`, so all twelve Sphinx 3.x instances died at pytest
+collection before a single assertion ran. Their patches were never tested at all — and
+three of them were byte-identical to the reference patch.
+
+Taking 26 of 50 at face value would have had me rewriting a prompt to fix a
+dependency pin.
+
+## Results
+
+<ResultsTable
+  caption="SWE-bench Verified Mini — one attempt per instance, official grader"
+  subjectLabel="Current harness"
+  baselineLabel="First pass"
+  rows={[
+    {
+      label: "Resolved (n=50)",
+      subject: "38 / 50",
+      baseline: "26 / 50",
+      winner: "subject",
+    },
+    {
+      label: "Failures caused by the grader (n=24)",
+      subject: "0",
+      baseline: "14",
+      winner: "subject",
+    },
+    {
+      label: "Errors / empty patches (n=50)",
+      subject: "0 / 0",
+      baseline: "0 / 0",
+      winner: null,
+    },
+  ]}
+  note="Both runs are a single attempt per instance. The first pass was graded on Modal, which rebuilds each image against current pip releases; the clean run was graded on the published evaluation images with docutils and Pygments pinned. The prompt gives the agent the failing test names and the test command, which leaderboard agents are not given — so neither number is comparable with a public leaderboard result."
+/>
+
+The clean run of all 50 on the fixed harness resolved <Claim id="harness-swebench">38 of 50 (76%), one attempt
+each</Claim>, with no errors and no empty patches. One instance regressed
+between runs, which is what a model pinned to temperature 1 does.
+
+## What the benchmark told me
+
+Three things, and the flattering one is the least interesting.
+
+**My own prompt was making the agent worse.** "Every passing test must still
+pass, never edit tests" sounds like discipline, and in practice it taught the
+agent to protect the bug whenever an existing test asserted the buggy
+behaviour. It kept the old output format rather than fixing it. The rule now
+says the opposite: a test that encodes the reported bug gets updated, and the
+requested behaviour becomes the default.
+
+**One sample from a judge is not a measurement.** Running three attempts per
+instance and having a blind judge pick one got <Claim id="harness-judge">7 of
+12 hard instances resolved, with some candidate passing on 8</Claim>. But two
+revisions of that judge, given identical inputs, picked differently — so the
+final judge votes three times and takes the majority. A single judge call
+looks like a measurement and behaves like a coin.
+
+**And a ceiling worth naming.** <Claim id="harness-never-solved">Four of the
+50 were never solved in any configuration I ran</Claim> — because the hidden
+test asserts something the issue text simply doesn't contain. Exact
+Itanium-ABI manglings of C++ user-defined literals aren't inferable from a
+bug report. 50 of 50 isn't a goal, it's a claim that the issue text holds
+information it doesn't.

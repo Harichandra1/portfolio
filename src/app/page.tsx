@@ -5,12 +5,14 @@ import { experience } from "@content/data/experience";
 import { skillGroups } from "@content/data/skills";
 import { Container } from "@/components/ui/container";
 import { Hero } from "@/components/sections/hero";
+import { SignalsTape } from "@/components/sections/signals-tape";
 import { SelectedWork } from "@/components/sections/selected-work";
 import { SectionHeading } from "@/components/sections/section";
 import { EntryCard } from "@/components/sections/entry-card";
 import { Skills } from "@/components/sections/skills";
 import { ExperienceTimeline } from "@/components/sections/experience-timeline";
 import { Contact } from "@/components/sections/contact";
+import { BookshelfCta } from "@/components/sections/bookshelf-cta";
 import { ReceiptsNote } from "@/components/sections/receipts-note";
 
 export const metadata = buildMetadata({ path: "/" });
@@ -28,6 +30,8 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+
+      <SignalsTape />
 
       <SelectedWork entries={projects} />
 
@@ -105,6 +109,8 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      <BookshelfCta />
 
       <ReceiptsNote />
       <Contact />

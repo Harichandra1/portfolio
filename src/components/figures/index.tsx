@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { AgentGraphFigure } from "./agent-graph";
 import { EvalGateFigure } from "./eval-gate";
+import { HarnessLoopFigure } from "./harness-loop";
 
 export type FigureProps = { variant?: "card" | "full" };
 
@@ -16,6 +17,7 @@ export type FigureProps = { variant?: "card" | "full" };
 export const figureRegistry: Record<string, ComponentType<FigureProps>> = {
   "agent-graph": AgentGraphFigure,
   "eval-gate": EvalGateFigure,
+  "harness-loop": HarnessLoopFigure,
 };
 
 export type FigureName = keyof typeof figureRegistry;

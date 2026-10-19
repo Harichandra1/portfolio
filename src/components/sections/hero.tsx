@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/container";
@@ -6,6 +7,8 @@ import { SceneView } from "@/three/canvas/scene-view";
 import { Sticker } from "@/components/stickers/sticker";
 
 export function Hero() {
+  const words = siteConfig.positioning.split(" ");
+
   return (
     <section className="relative overflow-hidden">
       {/*
@@ -48,8 +51,24 @@ export function Hero() {
           {siteConfig.role} · {siteConfig.location}
         </p>
 
-        <h1 className="font-display text-fg mt-5 max-w-2xl text-5xl text-balance sm:text-6xl">
-          {siteConfig.positioning}
+        {/*
+          The headline rises word by word on load — the one piece of motion
+          that greets a first-time visitor, and the reason the top of the page
+          no longer reads as a static block of serif.
+
+          The stagger is index-driven CSS (`.word-rise`, globals.css), not a JS
+          timeline, so it costs nothing and runs before hydration. The spaces
+          sit OUTSIDE the spans deliberately: each word is an inline-block, and
+          a space tucked inside one is not a line-break opportunity between
+          them, which would pin the whole headline to a single overflowing line.
+        */}
+        <h1 className="word-rise font-display text-fg mt-5 max-w-2xl text-5xl text-balance sm:text-6xl">
+          {words.map((word, i) => (
+            <Fragment key={`${word}-${i}`}>
+              <span style={{ "--i": i } as React.CSSProperties}>{word}</span>
+              {i < words.length - 1 ? " " : null}
+            </Fragment>
+          ))}
         </h1>
 
         <p className="text-fg-muted mt-6 max-w-lg text-lg text-pretty">

@@ -20,8 +20,11 @@ export const skillGroups: SkillGroup[] = [
     items: [
       "LangGraph",
       "Agentic RAG",
+      "ReAct tool loops",
       "Tool calling",
       "LLM-as-judge evaluation",
+      "SWE-bench benchmarking",
+      "Sandboxed agent execution",
       "Guardrails / PII redaction",
       "Provider failover",
       "Embeddings & vector search",

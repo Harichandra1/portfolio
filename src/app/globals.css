@@ -320,6 +320,63 @@
       transform: none;
     }
   }
+
+  /*
+   * Word-by-word rise for the hero headline. Each word is an inline-block
+   * span with its index in `--i`, so the stagger is one CSS rule rather than
+   * a per-word class or a JS timeline.
+   *
+   * The resting state is visible and the animation supplies the *hidden*
+   * start frame via `both`. That ordering matters: under reduced motion the
+   * animation is switched off entirely rather than merely shortened, and the
+   * words simply render. Shortening alone would leave each word invisible for
+   * the length of its delay, which the global kill-switch does not touch.
+   */
+  .word-rise > span {
+    display: inline-block;
+    animation: word-rise var(--dur-enter) var(--ease-out-quint) both;
+    /* 40ms, not more: fourteen words at 60ms left the headline blank for
+       the better part of a second on a phone, which is a worse first
+       impression than no animation at all. */
+    animation-delay: calc(var(--i) * 40ms);
+  }
+
+  @keyframes word-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.4em);
+    }
+  }
+
+  /*
+   * The signals tape under the hero: one track holding two identical copies
+   * of the list, translated by exactly -50% so the seam lands where the
+   * second copy begins. Hovering pauses it, because a reader who stopped to
+   * look at an item should not have it slide away.
+   *
+   * Under reduced motion the global kill-switch collapses this to a single
+   * instant iteration, which leaves the second copy parked at the start —
+   * visually identical to the first, so the band stays legible and still.
+   */
+  .tape {
+    animation: tape 64s linear infinite;
+  }
+
+  .tape:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes tape {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .word-rise > span {
+      animation: none;
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------
