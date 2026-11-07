@@ -163,7 +163,7 @@ cp /tmp/portico/portico/*.webp public/models/portico/
   paint. Optimize `creepers.raw.glb` like the portico but with
   `--simplify false`, and copy `creepers.json` alongside it. Each plant is
   pillar-local, so its shadow is baked into the pillar and end block but
-  deliberately *not* into the stretched runs.
+  deliberately _not_ into the stretched runs.
 - **The rails down the home page** (`rail-left` / `rail-right`) are one
   baked 1.6 m module (`Rail` in `creepers.glb`, `rail_wood.webp` /
   `rail_stone.webp`) stacked to the page's length, with a creeper grown in
