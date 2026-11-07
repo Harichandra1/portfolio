@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import type { SceneName } from "./names";
 import { HeroPoster } from "./hero/poster";
+import { PorticoPoster } from "./portico/poster";
+import { RailPoster } from "./portico/rail-poster";
 
 /**
  * The catalogue of 3D scenes.
@@ -35,6 +37,21 @@ export const sceneRegistry: Record<SceneName, SceneEntry> = {
     Component: dynamic(() => import("./hero"), { ssr: false }),
     Poster: HeroPoster,
     alt: "A quiet lattice of points rippling across a surface",
+  },
+  portico: {
+    Component: dynamic(() => import("./portico"), { ssr: false }),
+    Poster: PorticoPoster,
+    alt: "An architectural frame around the introduction: a carved walnut pier on the left and a fluted marble Ionic column on the right, carrying an entablature that turns from walnut into marble at a carved console, all of it overgrown with a flowering creeper",
+  },
+  "rail-left": {
+    Component: dynamic(() => import("./rail-left"), { ssr: false }),
+    Poster: RailPoster,
+    alt: "A slim walnut rail running down the left edge of the page, a flowering creeper twisting around it",
+  },
+  "rail-right": {
+    Component: dynamic(() => import("./rail-right"), { ssr: false }),
+    Poster: RailPoster,
+    alt: "A slim marble rail running down the right edge of the page, a flowering creeper twisting around it",
   },
 };
 

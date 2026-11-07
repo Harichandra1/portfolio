@@ -14,6 +14,7 @@ import { ExperienceTimeline } from "@/components/sections/experience-timeline";
 import { Contact } from "@/components/sections/contact";
 import { BookshelfCta } from "@/components/sections/bookshelf-cta";
 import { ReceiptsNote } from "@/components/sections/receipts-note";
+import { PorticoRails } from "@/components/sections/portico-rails";
 
 export const metadata = buildMetadata({ path: "/" });
 
@@ -33,87 +34,94 @@ export default async function HomePage() {
 
       <SignalsTape />
 
-      <SelectedWork entries={projects} />
+      {/* Everything below the tape, in one box the portico's rails can run
+          the full height of (components/sections/portico-rails.tsx). They
+          start under the tape, not behind it. */}
+      <div className="relative">
+        <PorticoRails />
 
-      <section className="border-border border-t py-20">
-        <Container width="prose">
-          <p className="text-fg-muted text-lg">
-            I&rsquo;m a backend engineer in Hyderabad, currently a founding engineer at
-            Metry AI. I like the parts of a system that are unglamorous and load-bearing —
-            and I build agent systems on the side mostly to find out where they break.
-          </p>
-          <Link
-            href="/about"
-            className="decoration-border-strong hover:decoration-accent text-fg mt-4 inline-block font-mono text-xs tracking-wide uppercase underline underline-offset-4"
-          >
-            More about me
-          </Link>
-        </Container>
-      </section>
+        <SelectedWork entries={projects} />
 
-      <Skills groups={skillGroups} />
-      <ExperienceTimeline roles={experience} />
-
-      {(recentPosts.length > 0 || recentLab.length > 0) && (
-        <section className="py-20">
-          <Container width="wide">
-            <div className="grid gap-12 sm:grid-cols-2">
-              {recentPosts.length > 0 ? (
-                <div>
-                  <SectionHeading
-                    action={
-                      <Link
-                        href="/blog"
-                        className="text-fg-muted hover:text-fg font-mono text-xs tracking-wide uppercase transition-colors"
-                      >
-                        All posts
-                      </Link>
-                    }
-                  >
-                    Writing
-                  </SectionHeading>
-                  <ul className="space-y-4">
-                    {recentPosts.map((entry) => (
-                      <li key={entry.slug}>
-                        <EntryCard entry={entry} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              {recentLab.length > 0 ? (
-                <div>
-                  <SectionHeading
-                    action={
-                      <Link
-                        href="/lab"
-                        className="text-fg-muted hover:text-fg font-mono text-xs tracking-wide uppercase transition-colors"
-                      >
-                        All experiments
-                      </Link>
-                    }
-                  >
-                    Lab
-                  </SectionHeading>
-                  <ul className="space-y-4">
-                    {recentLab.map((entry) => (
-                      <li key={entry.slug}>
-                        <EntryCard entry={entry} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
+        <section className="border-border border-t py-20">
+          <Container width="prose">
+            <p className="text-fg-muted text-lg">
+              I&rsquo;m a backend engineer in Hyderabad, currently a founding engineer at
+              Metry AI. I like the parts of a system that are unglamorous and load-bearing
+              — and I build agent systems on the side mostly to find out where they break.
+            </p>
+            <Link
+              href="/about"
+              className="decoration-border-strong hover:decoration-accent text-fg mt-4 inline-block font-mono text-xs tracking-wide uppercase underline underline-offset-4"
+            >
+              More about me
+            </Link>
           </Container>
         </section>
-      )}
 
-      <BookshelfCta />
+        <Skills groups={skillGroups} />
+        <ExperienceTimeline roles={experience} />
 
-      <ReceiptsNote />
-      <Contact />
+        {(recentPosts.length > 0 || recentLab.length > 0) && (
+          <section className="py-20">
+            <Container width="wide">
+              <div className="grid gap-12 sm:grid-cols-2">
+                {recentPosts.length > 0 ? (
+                  <div>
+                    <SectionHeading
+                      action={
+                        <Link
+                          href="/blog"
+                          className="text-fg-muted hover:text-fg font-mono text-xs tracking-wide uppercase transition-colors"
+                        >
+                          All posts
+                        </Link>
+                      }
+                    >
+                      Writing
+                    </SectionHeading>
+                    <ul className="space-y-4">
+                      {recentPosts.map((entry) => (
+                        <li key={entry.slug}>
+                          <EntryCard entry={entry} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                {recentLab.length > 0 ? (
+                  <div>
+                    <SectionHeading
+                      action={
+                        <Link
+                          href="/lab"
+                          className="text-fg-muted hover:text-fg font-mono text-xs tracking-wide uppercase transition-colors"
+                        >
+                          All experiments
+                        </Link>
+                      }
+                    >
+                      Lab
+                    </SectionHeading>
+                    <ul className="space-y-4">
+                      {recentLab.map((entry) => (
+                        <li key={entry.slug}>
+                          <EntryCard entry={entry} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </Container>
+          </section>
+        )}
+
+        <BookshelfCta />
+
+        <ReceiptsNote />
+        <Contact />
+      </div>
     </>
   );
 }

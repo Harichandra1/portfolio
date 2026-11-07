@@ -131,6 +131,50 @@ banner on that content's detail page.
   npx gltfjsx public/models/out.glb -o src/three/components/Out.tsx -t
   ```
 
+### Baked scenes (the hero portico)
+
+The portico is modelled in Blender from code — `scripts/blender/portico.py`
+builds every molding, flute, volute and leaf, bakes Cycles lighting into
+textures, and exports the GLB. To change it, edit the script and rebuild:
+
+```bash
+blender -b -P scripts/blender/portico.py -- --out /tmp/portico --preview /tmp/portico.png --blend /tmp/portico.blend
+npx @gltf-transform/cli optimize /tmp/portico/portico/portico.raw.glb public/models/portico/portico.glb \
+  --compress meshopt --texture-compress false --join false --instance false --flatten false --palette false \
+  --simplify true --simplify-error 0.0004
+cp /tmp/portico/portico/*.webp public/models/portico/
+```
+
+`--no-bake` skips the four-minute bake while you iterate on geometry, and
+`--closeups` renders detail shots next to the preview.
+
+- **Keep `--join false --instance false`.** The page looks the pieces up by
+  name and places them itself; a joined mesh has no pieces to place.
+- **Meshopt moves each mesh's dequantizing scale onto its node.** Render a
+  piece's `geometry` without its node's position/quaternion/scale and it
+  comes out a metre-sized blob at the origin. `index.tsx` applies them.
+- **The entablature is modules, not a beam,** so the frame fits any width.
+  `layout()` in the script and `layout.ts` are the same rule written twice —
+  change one, change the other.
+- **The creepers are painted, not baked.** The same script writes
+  `creepers.glb` (stems plus four prototype meshes) and `creepers.json`
+  (every leaf and flower: matrix, colour, sway, sun, sky, grow — the sun/sky
+  values are ray cast against the architecture). `paint.ts` draws them as oil
+  paint. Optimize `creepers.raw.glb` like the portico but with
+  `--simplify false`, and copy `creepers.json` alongside it. Each plant is
+  pillar-local, so its shadow is baked into the pillar and end block but
+  deliberately _not_ into the stretched runs.
+- **The rails down the home page** (`rail-left` / `rail-right`) are one
+  baked 1.6 m module (`Rail` in `creepers.glb`, `rail_wood.webp` /
+  `rail_stone.webp`) stacked to the page's length, with a creeper grown in
+  code (`portico/rail.tsx`) that grows as you scroll. They stand under the
+  pillars by asking `frameMetrics()` where the camera put them — if you
+  change the hero's fit, the rails follow. `[data-portico-hero]` on the
+  hero section is what they measure; don't remove it.
+- **The light is baked into the emissive map** and the base colour is black,
+  so nothing lights it twice; only gloss is live. Moving the sun means
+  re-baking, and the `Lightformer`s should follow it.
+
 ### The guarantees
 
 Every scene degrades to its poster when: `prefers-reduced-motion` is set, there

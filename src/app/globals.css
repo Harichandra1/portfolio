@@ -54,6 +54,18 @@
   --scene-opacity: 0.5;
   --scene-additive: 0; /* read as a boolean by the scene: 0 = normal blending */
 
+  /* The hero portico — src/three/scenes/portico. Walnut and marble are baked
+     into its textures, light and all, and like --paper-* and --sticker-*
+     they do not invert with the theme: an object doesn't. These only set
+     how brightly it is shown and how much its finish shines.
+       exposure  multiplies the baked light (1 = as Cycles rendered it)
+       gloss     the lacquer and marble sheen that moves with the pointer
+       shadow    the opacity of the baked floor shadow under each pillar */
+  --portico-exposure: 1;
+  --portico-gloss: 0.55;
+  --portico-shadow: 0.55;
+  --portico-poster-opacity: 0.7;
+
   /* Motion. Respect these instead of hardcoding durations so the whole site
      can be slowed down or sped up from one place. */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -112,6 +124,14 @@
   --scene-color-hex: #a9a49c;
   --scene-opacity: 0.55;
   --scene-additive: 1;
+
+  /* On a near-black page the same object is shown a touch dimmer, so it
+     sits in the room rather than glowing out of it; the floor shadow
+     mostly disappears, as it would on a dark floor. */
+  --portico-exposure: 0.88;
+  --portico-gloss: 0.7;
+  --portico-shadow: 0.35;
+  --portico-poster-opacity: 0.55;
 }
 
 /* ---------------------------------------------------------------------------

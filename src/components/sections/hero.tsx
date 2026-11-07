@@ -10,7 +10,7 @@ export function Hero() {
   const words = siteConfig.positioning.split(" ");
 
   return (
-    <section className="relative overflow-hidden">
+    <section data-portico-hero className="relative overflow-hidden">
       {/*
         A contained panel, not a full-bleed band — a signature in the corner
         rather than a particle backdrop behind the copy. It never competes
@@ -24,7 +24,7 @@ export function Hero() {
       */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 w-full max-w-[16rem] sm:max-w-[22rem] md:max-w-[28rem]"
+        className="pointer-events-none absolute inset-y-0 right-0 w-full max-w-[16rem] sm:max-w-[22rem] md:max-w-[28rem] xl:hidden"
         style={{
           maskImage: "linear-gradient(to left, black 45%, transparent 92%)",
           WebkitMaskImage: "linear-gradient(to left, black 45%, transparent 92%)",
@@ -33,7 +33,36 @@ export function Hero() {
         <SceneView name="hero" />
       </div>
 
-      <Container width="wide" className="relative py-16 sm:py-24 lg:py-32">
+      {/*
+        From xl up, the portico frames the whole introduction instead: a
+        walnut pier at the left edge, a marble column at the right, the
+        entablature across the top (src/three/scenes/portico).
+
+        xl and not lg, deliberately. The frame's pillars are sized by the
+        section's height, so they are about the same width on every screen,
+        and below ~1280px the column would stand in the headline. A frame
+        that crowds the thing it frames is worse than none — the narrower
+        screens keep the quiet panel above, which can sit behind copy.
+
+        The container below is padded at xl to keep the copy inside the
+        frame: under the entablature, clear of the pier.
+      */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 hidden xl:block">
+        <SceneView name="portico" />
+      </div>
+
+      {/*
+        xl:pt-56 puts the eyebrow below the architrave, which the camera
+        places about a fifth of the way down the section (it leaves room
+        above the cornice for the creeper's leaves). The left padding keeps
+        the copy ~248px from the viewport's edge, clear of the pier's
+        capital; on screens wide enough that the centred container is
+        already that far in, it falls back to the normal gutter.
+      */}
+      <Container
+        width="wide"
+        className="relative py-16 sm:py-24 lg:py-32 xl:pt-56 xl:pl-[max(var(--spacing-gutter),calc(15.5rem_-_(100vw_-_64rem)_/_2))]"
+      >
         {/*
           The one sticker on a page that has to be believed. Wordless on
           purpose — the hero already asks for a headline, a paragraph and
@@ -44,7 +73,7 @@ export function Hero() {
         */}
         <Sticker
           name="chai"
-          className="bottom-32 left-[56%] hidden w-20 -rotate-[12deg] lg:block xl:left-[50%]"
+          className="bottom-32 left-[56%] hidden w-20 -rotate-[12deg] lg:block xl:left-[58%]"
         />
 
         <p className="text-fg-subtle font-mono text-xs tracking-wide uppercase">
