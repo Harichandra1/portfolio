@@ -9,7 +9,7 @@
  * Add a name here first; `registry.ts` is typed against this list, so TypeScript
  * will tell you the entry is missing.
  */
-export const sceneNames = ["hero"] as const;
+export const sceneNames = ["hero", "portico", "rail-left", "rail-right"] as const;
 
 export type SceneName = (typeof sceneNames)[number];
 
